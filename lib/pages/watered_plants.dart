@@ -17,6 +17,7 @@ class WetPlantsPageState extends State<WetPlantsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.green,
         title: Text('Mis plantitas'),
         actions: <Widget>[
           IconButton(
@@ -29,67 +30,84 @@ class WetPlantsPageState extends State<WetPlantsPage> {
       ),
       body: FutureBuilder<List>(
         future: _getWateredPlants(),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
           final wateredPlantList = snapshot.data;
           return snapshot.connectionState == ConnectionState.done
-              ? ListView.builder(
-                  padding: EdgeInsets.only(top: 5.0),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: wateredPlantList.length,
-                  itemBuilder: (context, index) {
-                    String plantName = wateredPlantList.elementAt(index).name;
-                    String plantImage = wateredPlantList.elementAt(index).image;
-                    int plantId = wateredPlantList.elementAt(index).id;
-                    int minDays = wateredPlantList.elementAt(index).minWateringDays;
-                    int maxDays = wateredPlantList.elementAt(index).maxWateringDays;
-                    int actualDays = wateredPlantList.elementAt(index).daysSinceLastDayWatering;
-                    return Card(
-                        elevation: 3.0,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Image.network(plantImage != null ? plantImage : '',
-                                  height: 75,
-                                  width: 75,
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.center),
-                              Flexible(
-                                  child: GestureDetector(
-                                      onTap: () => goToEditWateredPlant(plantId),
-                                      child: Container(
-                                          margin: EdgeInsets.only(top: 5.0),
-                                          child: Column(children: <Widget>[
-                                            Text(plantName,
-                                                style: TextStyle(fontSize: 16.0),
-                                                textAlign: TextAlign.center)
-                                          ])))),
-                              Flexible(
-                                  child: Container(
-                                      height: 75,
-                                      width: 100,
-                                      alignment: Alignment.centerRight,
-                                      child: RaisedButton(
-                                          child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                Text('Sin regar',
-                                                    style: TextStyle(color: Colors.white)),
-                                                Text(actualDays.toString(),
-                                                    style: TextStyle(
-                                                        fontSize: 16.0, color: Colors.white)),
-                                                Text(actualDays == 1 ? 'día' : 'días',
-                                                    style: TextStyle(color: Colors.white))
-                                              ]),
-                                          shape: new RoundedRectangleBorder(
-                                              borderRadius: new BorderRadius.circular(0.0)),
-                                          onPressed: minDays - actualDays <= 0
-                                              ? () => _selectDate(context, plantId, actualDays)
-                                              : null,
-                                          color: HandleWateredDays.getColorsFromLastDaysWatering(
-                                              minDays, maxDays, actualDays))))
-                            ]));
-                  })
+              ? RefreshIndicator(
+                  onRefresh: _getWateredPlants,
+                  child: ListView.builder(
+                      padding: EdgeInsets.only(top: 5.0),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: wateredPlantList.length,
+                      itemBuilder: (context, index) {
+                        String plantName = wateredPlantList.elementAt(index).name;
+                        String plantImage = wateredPlantList.elementAt(index).image;
+                        int plantId = wateredPlantList.elementAt(index).id;
+                        int minDays = wateredPlantList.elementAt(index).minWateringDays;
+                        int maxDays = wateredPlantList.elementAt(index).maxWateringDays;
+                        int actualDays = wateredPlantList.elementAt(index).daysSinceLastDayWatering;
+                        return Card(
+                            elevation: 3.0,
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Container(
+                                            height: 110,
+                                            width: 100,
+                                            alignment: Alignment.centerLeft,
+                                            child: RaisedButton(
+                                                child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.spaceEvenly,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: <Widget>[
+                                                      Text('Sin regar',
+                                                          style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.w600)),
+                                                      Text(actualDays.toString(),
+                                                          style: TextStyle(
+                                                              fontSize: 32.0,
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.w600)),
+                                                      Text(actualDays == 1 ? 'día' : 'días',
+                                                          style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.w600))
+                                                    ]),
+                                                onPressed: minDays - actualDays <= 0
+                                                    ? () =>
+                                                        _selectDate(context, plantId, actualDays)
+                                                    : null,
+                                                color:
+                                                    HandleWateredDays.getColorsFromLastDaysWatering(
+                                                        minDays, maxDays, actualDays))),
+                                        Container(
+                                            height: 100,
+                                            width: MediaQuery.of(context).size.width / 2.5,
+                                            alignment: Alignment.centerLeft,
+                                            child: GestureDetector(
+                                                onTap: () => goToEditWateredPlant(plantId),
+                                                child: Container(
+                                                    child: Text(
+                                                  plantName,
+                                                  style: TextStyle(
+                                                      fontSize: 20.0),
+                                                  textAlign: TextAlign.start,
+                                                )))),
+                                      ]),
+                                  Image.network(plantImage != null ? plantImage : '',
+                                      height: 110,
+                                      width: 110,
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.center)
+                                ]));
+                      }))
               : Center(child: CircularProgressIndicator());
         },
       ),
@@ -113,7 +131,7 @@ class WetPlantsPageState extends State<WetPlantsPage> {
   }
 
   _goToNewWateredPlant(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => EditWateredPlant()));
+    Navigator.pushReplacementNamed(context, '/edit');
   }
 
   DateTime today = DateTime.now();
@@ -140,7 +158,7 @@ class WetPlantsPageState extends State<WetPlantsPage> {
 
   goToEditWateredPlant(int plantId) async {
     var wateredPlant = await _getWateredPlant(plantId);
-    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
       return EditWateredPlant(wateredPlant: wateredPlant);
     }));
   }

@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:wetplant/model/watered_plant.dart';
-import 'package:wetplant/pages/watered_plants.dart';
 import 'package:wetplant/util/image_input.dart';
 
 class EditWateredPlant extends StatefulWidget {
@@ -57,87 +56,93 @@ class EditWateredPlantState extends State<EditWateredPlant> {
         ? Scaffold(
             body: Center(
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              CircularProgressIndicator(),
-              SizedBox(height: 10.0),
-              Text(_waitingMessage)
-            ])))
-        : Scaffold(
-            appBar: AppBar(
+            CircularProgressIndicator(),
+            SizedBox(height: 10.0),
+            Text(_waitingMessage)
+          ])))
+        : Scaffold(backgroundColor: Colors.green,
+            appBar: AppBar(elevation: 0.0,
+              leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: _goToWetPlantsPage),
               title: Text(_appBarTitle),
             ),
-            body: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                    padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
-                    child: Column(children: <Widget>[
-                      TextFormField(
-                        controller: _nameTextController,
-                        decoration: InputDecoration(helperText: 'Nombre'),
-                        maxLength: 35,
-                        validator: (String value) {
-                          if (value.isEmpty || value.length < 0) return 'Debe tener un nombre';
-                        },
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Flexible(
-                              child: Container(
-                                  padding: EdgeInsets.only(right: 15.0),
-                                  child: TextFormField(
-                                      inputFormatters: [
-                                        WhitelistingTextInputFormatter(numberRegExp)
-                                      ],
-                                      validator: (String value) {
-                                        if (value.isEmpty) return 'No puede ser vacio';
-                                        if (int.parse(value) < 0)
-                                          return 'Debe ser un número mayor a 0';
-                                      },
-                                      controller: _minDaysTextController,
-                                      decoration:
-                                          InputDecoration(helperText: 'Min. Días', counterText: ''),
-                                      maxLength: 2))),
-                          Flexible(
-                              child: Container(
-                                  padding: EdgeInsets.only(left: 15.0),
-                                  child: TextFormField(
-                                      inputFormatters: [
-                                        WhitelistingTextInputFormatter(numberRegExp)
-                                      ],
-                                      validator: (String value) {
-                                        if (value.isEmpty) return 'No puede ser vacio';
-                                        if (int.parse(value) <
-                                            int.parse(_minDaysTextController.text))
-                                          return 'Debe ser mayor a Min. Días';
-                                      },
-                                      controller: _maxDaysTextController,
-                                      decoration:
-                                          InputDecoration(helperText: 'Max. Días', counterText: ''),
-                                      maxLength: 2))),
-                        ],
-                      ),
-                      SizedBox(height: 5.0),
-                      Container(
-                          child: TextField(
-                              enableInteractiveSelection: false,
-                              focusNode: FocusNode(),
-                              onTap: () => _selectDate(context),
-                              controller: _dateTextController,
-                              decoration: InputDecoration(
-                                helperText: 'Último día de regado',
-                                errorText: _validate ? 'Debes ingresar una fecha' : null,
-                              ))),
-                      SizedBox(height: 5.0),
-                      ImageInput(setImageFile, _imagePlant),
-                      Container(
-                          width: double.infinity,
-                          child: RaisedButton(
-                              color: Colors.green,
-                              onPressed: widget.wateredPlant == null
-                                  ? _saveNewWateredPlant
-                                  : _updateWateredPlant,
-                              child: Text('Guardar', style: TextStyle(color: Colors.white))))
-                    ]))));
+            body: Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+              elevation: 4.0,
+              margin: new EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+              child: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                      padding: EdgeInsets.all(15.0),
+                      child: Column(children: <Widget>[
+                        TextFormField(
+                          controller: _nameTextController,
+                          decoration: InputDecoration(helperText: 'Nombre'),
+                          maxLength: 35,
+                          validator: (String value) {
+                            if (value.isEmpty || value.length < 0) return 'Debe tener un nombre';
+                          },
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Flexible(
+                                child: Container(
+                                    padding: EdgeInsets.only(right: 15.0),
+                                    child: TextFormField(
+                                        inputFormatters: [
+                                          WhitelistingTextInputFormatter(numberRegExp)
+                                        ],
+                                        validator: (String value) {
+                                          if (value.isEmpty) return 'No puede ser vacio';
+                                          if (int.parse(value) < 0)
+                                            return 'Debe ser un número mayor a 0';
+                                        },
+                                        controller: _minDaysTextController,
+                                        decoration:
+                                            InputDecoration(helperText: 'Min. Días', counterText: ''),
+                                        maxLength: 2))),
+                            Flexible(
+                                child: Container(
+                                    padding: EdgeInsets.only(left: 15.0),
+                                    child: TextFormField(
+                                        inputFormatters: [
+                                          WhitelistingTextInputFormatter(numberRegExp)
+                                        ],
+                                        validator: (String value) {
+                                          if (value.isEmpty) return 'No puede ser vacio';
+                                          if (int.parse(value) <
+                                              int.parse(_minDaysTextController.text))
+                                            return 'Debe ser mayor a Min. Días';
+                                        },
+                                        controller: _maxDaysTextController,
+                                        decoration:
+                                            InputDecoration(helperText: 'Max. Días', counterText: ''),
+                                        maxLength: 2))),
+                          ],
+                        ),
+                        SizedBox(height: 5.0),
+                        Container(
+                            child: TextField(
+                                enableInteractiveSelection: false,
+                                focusNode: FocusNode(),
+                                onTap: () => _selectDate(context),
+                                controller: _dateTextController,
+                                decoration: InputDecoration(
+                                  helperText: 'Último día de regado',
+                                  errorText: _validate ? 'Debes ingresar una fecha' : null,
+                                ))),
+                        SizedBox(height: 5.0),
+                        ImageInput(setImageFile, _imagePlant),
+                        Container(
+                            width: double.infinity,
+                            child: RaisedButton(
+                                color: Colors.green,
+                                onPressed: widget.wateredPlant == null
+                                    ? _saveNewWateredPlant
+                                    : _updateWateredPlant,
+                                child: Text('Guardar', style: TextStyle(color: Colors.white))))
+                      ]))),
+            ));
   }
 
   setImageFile(File imageFileSource) {
@@ -202,7 +207,7 @@ class EditWateredPlantState extends State<EditWateredPlant> {
       'minWateringDays': _minDaysTextController.text,
       'maxWateringDays': _maxDaysTextController.text,
       'name': _nameTextController.text,
-      'image':_imagePlant
+      'image': _imagePlant
     };
     http.Response res = await http.put("http://192.168.1.45:8080/wateredplant/",
         body: jsonEncode(jsonWateredPlant), headers: {'Content-Type': 'application/json'});
@@ -223,6 +228,6 @@ class EditWateredPlantState extends State<EditWateredPlant> {
   }
 
   _goToWetPlantsPage() {
-    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, '/');
   }
 }

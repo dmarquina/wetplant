@@ -66,7 +66,7 @@ class _ImageInputState extends State<ImageInput> {
     var _buttonColor = Theme.of(context).primaryColor;
     return Column(children: <Widget>[
       SizedBox(height: 5.0),
-      _checkImageSource(_imageFile, widget.imageSource),
+          _getImageFromSource(_imageFile, widget.imageSource),
       OutlineButton(
         borderSide: BorderSide(color: _buttonColor, width: 2.0),
         onPressed: () {
@@ -84,7 +84,7 @@ class _ImageInputState extends State<ImageInput> {
     ]);
   }
 
-  Widget _checkImageSource(File imageFile, String imageSource) {
+  Widget _getImageFromSource(File imageFile, String imageSource) {
     Widget imageWidget;
     if (imageFile == null && (imageSource == '' || imageSource == null)) {
       imageWidget = SizedBox(height: 5.0);
