@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 class HandleWateredDays {
   static Color getColorsFromLastDaysWatering(int minDays, int maxDays, int actualDays) {
     Color color = Colors.grey;
+    if(actualDays==0){
+      color = Colors.white;
+    }
     if (minDays <= actualDays && actualDays <= maxDays) {
       color = Colors.green;
     }

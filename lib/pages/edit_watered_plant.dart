@@ -7,24 +7,27 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:wetplant/model/watered_plant.dart';
+import 'package:wetplant/pages/login.dart';
+import 'package:wetplant/pages/watered_plants.dart';
 import 'package:wetplant/util/image_input.dart';
 
-class EditWateredPlant extends StatefulWidget {
+class EditWateredPlantPage extends StatefulWidget {
   final WateredPlant wateredPlant;
+  final String userId;
 
-  EditWateredPlant({this.wateredPlant});
+  EditWateredPlantPage(this.userId, {this.wateredPlant});
 
   @override
-  EditWateredPlantState createState() {
-    return new EditWateredPlantState();
+  EditWateredPlantPageState createState() {
+    return new EditWateredPlantPageState();
   }
 }
 
-class EditWateredPlantState extends State<EditWateredPlant> {
+class EditWateredPlantPageState extends State<EditWateredPlantPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _nameTextController = TextEditingController(text: '');
-  final _minDaysTextController = TextEditingController(text: '');
-  final _maxDaysTextController = TextEditingController(text: '');
+  final _minDaysTextController = TextEditingController(text: '7');
+  final _maxDaysTextController = TextEditingController(text: '14');
   final _dateTextController = TextEditingController(text: '');
   File imageFile;
   String _dateTextToSave = '';
@@ -60,15 +63,22 @@ class EditWateredPlantState extends State<EditWateredPlant> {
             SizedBox(height: 10.0),
             Text(_waitingMessage)
           ])))
-        : Scaffold(backgroundColor: Colors.green,
-            appBar: AppBar(elevation: 0.0,
+        : Scaffold(
+            backgroundColor: Colors.green,
+            appBar: AppBar(actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.input),
+                  color: Colors.white,
+                  onPressed: _goToLogin)
+            ],
+              elevation: 0.0,
               leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: _goToWetPlantsPage),
               title: Text(_appBarTitle),
             ),
             body: Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
               elevation: 4.0,
-              margin: new EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+              margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(
@@ -98,8 +108,8 @@ class EditWateredPlantState extends State<EditWateredPlant> {
                                             return 'Debe ser un número mayor a 0';
                                         },
                                         controller: _minDaysTextController,
-                                        decoration:
-                                            InputDecoration(helperText: 'Min. Días', counterText: ''),
+                                        decoration: InputDecoration(
+                                            helperText: 'Min. Días', counterText: ''),
                                         maxLength: 2))),
                             Flexible(
                                 child: Container(
@@ -115,8 +125,8 @@ class EditWateredPlantState extends State<EditWateredPlant> {
                                             return 'Debe ser mayor a Min. Días';
                                         },
                                         controller: _maxDaysTextController,
-                                        decoration:
-                                            InputDecoration(helperText: 'Max. Días', counterText: ''),
+                                        decoration: InputDecoration(
+                                            helperText: 'Max. Días', counterText: ''),
                                         maxLength: 2))),
                           ],
                         ),
@@ -180,12 +190,13 @@ class EditWateredPlantState extends State<EditWateredPlant> {
       _waitingAction = true;
     });
     Map<String, dynamic> jsonWateredPlant = {
+      'userId': widget.userId,
       'lastDayWatering': _dateTextToSave,
       'minWateringDays': _minDaysTextController.text,
       'maxWateringDays': _maxDaysTextController.text,
       'name': _nameTextController.text
     };
-    http.Response res = await http.post("http://192.168.1.45:8080/wateredplant/",
+    http.Response res = await http.post("http://localhost:8080/wateredplant/",
         body: jsonEncode(jsonWateredPlant), headers: {'Content-Type': 'application/json'});
     await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
     _goToWetPlantsPage();
@@ -203,13 +214,14 @@ class EditWateredPlantState extends State<EditWateredPlant> {
     });
     Map<String, dynamic> jsonWateredPlant = {
       'id': widget.wateredPlant.id.toString(),
+      'userId': widget.userId,
       'lastDayWatering': _dateTextToSave,
       'minWateringDays': _minDaysTextController.text,
       'maxWateringDays': _maxDaysTextController.text,
       'name': _nameTextController.text,
       'image': _imagePlant
     };
-    http.Response res = await http.put("http://192.168.1.45:8080/wateredplant/",
+    http.Response res = await http.put("http://localhost:8080/wateredplant/",
         body: jsonEncode(jsonWateredPlant), headers: {'Content-Type': 'application/json'});
     if (imageFile != null) {
       await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
@@ -218,7 +230,7 @@ class EditWateredPlantState extends State<EditWateredPlant> {
   }
 
   Future<http.StreamedResponse> _addImage(String id, File image) {
-    var url = Uri.parse("http://192.168.1.45:8080/wateredplant/image");
+    var url = Uri.parse("http://localhost:8080/wateredplant/image");
     var request = new http.MultipartRequest("POST", url);
     request.headers['content-type'] = 'multipart/form-data';
     request.fields['id'] = id;
@@ -227,7 +239,16 @@ class EditWateredPlantState extends State<EditWateredPlant> {
     return request.send();
   }
 
+  _goToLogin(){
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
+      return LoginPage();
+    }));
+  }
+
   _goToWetPlantsPage() {
-    Navigator.pushReplacementNamed(context, '/');
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute<bool>(
+            builder: (BuildContext context) => WateredPlantsPage(widget.userId)));
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:wetplant/pages/edit_watered_plant.dart';
-import 'package:wetplant/pages/watered_plants.dart';
+import 'package:wetplant/pages/login.dart';
 
 void main() {
 //  debugPaintSizeEnabled = true;
@@ -17,9 +15,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.green,
         ),
-        routes: {
-          '/': (BuildContext context) => WetPlantsPage(),
-          '/edit': (BuildContext context) => EditWateredPlant()
-        });
+        home: LoginPage());
   }
 }
