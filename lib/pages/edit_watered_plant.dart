@@ -196,7 +196,7 @@ class EditWateredPlantPageState extends State<EditWateredPlantPage> {
       'maxWateringDays': _maxDaysTextController.text,
       'name': _nameTextController.text
     };
-    http.Response res = await http.post("http://localhost:8080/wateredplant/",
+    http.Response res = await http.post("http://192.168.1.40:8080/wateredplant/",
         body: jsonEncode(jsonWateredPlant), headers: {'Content-Type': 'application/json'});
     await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
     _goToWetPlantsPage();
@@ -221,7 +221,7 @@ class EditWateredPlantPageState extends State<EditWateredPlantPage> {
       'name': _nameTextController.text,
       'image': _imagePlant
     };
-    http.Response res = await http.put("http://localhost:8080/wateredplant/",
+    http.Response res = await http.put("http://192.168.1.40:8080/wateredplant/",
         body: jsonEncode(jsonWateredPlant), headers: {'Content-Type': 'application/json'});
     if (imageFile != null) {
       await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
@@ -230,7 +230,7 @@ class EditWateredPlantPageState extends State<EditWateredPlantPage> {
   }
 
   Future<http.StreamedResponse> _addImage(String id, File image) {
-    var url = Uri.parse("http://localhost:8080/wateredplant/image");
+    var url = Uri.parse("http://192.168.1.40:8080/wateredplant/image");
     var request = new http.MultipartRequest("POST", url);
     request.headers['content-type'] = 'multipart/form-data';
     request.fields['id'] = id;

@@ -35,7 +35,7 @@ class WateredPlantsPageState extends State<WateredPlantsPage> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           final List<WateredPlant> wateredPlantList = snapshot.data;
           return snapshot.connectionState == ConnectionState.done
-              ? wateredPlantList.length > 0
+              ? wateredPlantList != null && wateredPlantList.length > 0
                   ? RefreshIndicator(
                       onRefresh: _getWateredPlants,
                       child: ListView.builder(
@@ -73,14 +73,14 @@ class WateredPlantsPageState extends State<WateredPlantsPage> {
                                                         children: <Widget>[
                                                           actualDays == 0
                                                               ? Column(children: <Widget>[
-                                                            Text('REGADA',
-                                                                style: TextStyle(
-                                                                    fontSize: 15.0,
-                                                                    color: Colors.white,
-                                                                    fontWeight:
-                                                                    FontWeight.w600)),
-                                                            SizedBox(height: 10.0),
-                                                            Icon(Icons.tag_faces,
+                                                                  Text('REGADA',
+                                                                      style: TextStyle(
+                                                                          fontSize: 15.0,
+                                                                          color: Colors.white,
+                                                                          fontWeight:
+                                                                              FontWeight.w600)),
+                                                                  SizedBox(height: 10.0),
+                                                                  Icon(Icons.tag_faces,
                                                                       size: 35.0,
                                                                       color: Colors.white),
                                                                   SizedBox(height: 10.0),
@@ -181,7 +181,7 @@ class WateredPlantsPageState extends State<WateredPlantsPage> {
   }
 
   Future<List> _getWateredPlants() async {
-    var res = await http.get("http://localhost:8080/wateredplant/user/${widget.userId}");
+    var res = await http.get("http://192.168.1.40:8080/wateredplant/user/${widget.userId}");
     List<dynamic> decodeJson = jsonDecode(res.body);
     return decodeJson.map((json) {
       WateredPlant wp = new WateredPlant(
@@ -220,7 +220,7 @@ class WateredPlantsPageState extends State<WateredPlantsPage> {
   }
 
   waterPlant(int plantId, String newLastDayWatering) async =>
-      await http.patch('http://localhost:8080/wateredplant/$plantId',
+      await http.patch('http://192.168.1.40:8080/wateredplant/$plantId',
           body: jsonEncode({'lastDayWatering': newLastDayWatering}),
           headers: {'Content-Type': 'application/json'});
 
@@ -238,7 +238,7 @@ class WateredPlantsPageState extends State<WateredPlantsPage> {
   }
 
   Future<WateredPlant> _getWateredPlant(int plantId) async {
-    var res = await http.get('http://localhost:8080/wateredplant/$plantId');
+    var res = await http.get('http://192.168.1.40:8080/wateredplant/$plantId');
     dynamic wateredPlant = jsonDecode(res.body);
 
     WateredPlant wateredPlantDetail = new WateredPlant(

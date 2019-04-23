@@ -9,7 +9,7 @@ class HandleWateredDays {
       color = Colors.white;
     }
     if (minDays <= actualDays && actualDays <= maxDays) {
-      color = Colors.green;
+      color = Colors.teal;
     }
     if (maxDays < actualDays && actualDays <= maxDays + 7) {
       color = Colors.amber;
