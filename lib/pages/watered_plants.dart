@@ -4,15 +4,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:wetplant/components/custom_scroll_color.dart';
-import 'package:wetplant/components/fab_bottom_app_bar.dart';
 import 'package:wetplant/components/page_title.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/watered_plant.dart';
 import 'package:wetplant/pages/edit_watered_plant.dart';
 import 'package:wetplant/pages/login.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
-import 'package:wetplant/util/handle_watered_days.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class WateredPlantsPage extends StatefulWidget {
   final String userId;
