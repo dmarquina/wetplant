@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:wetplant/constants/colors';
+import 'package:wetplant/pages/page_manager.dart';
 import 'dart:convert';
 
 import 'package:wetplant/pages/watered_plants.dart';
+import 'package:wetplant/util/custom_icons_icons.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -22,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: _isLoading ? Colors.white : Colors.green,
+        backgroundColor: _isLoading ? Colors.white : GreenMain,
         body: _isLoading
             ? Center(
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
@@ -35,6 +38,8 @@ class _LoginPageState extends State<LoginPage> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Center(child: Icon(CustomIcons.water_amount_large,color: Colors.white,size: 80)),
+                  SizedBox(height: 50.0),
                   Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                       elevation: 4.0,
@@ -44,13 +49,14 @@ class _LoginPageState extends State<LoginPage> {
                           child: SingleChildScrollView(
                               padding: EdgeInsets.all(20.0),
                               child: Column(children: <Widget>[
-                                Text('Bienvenid@',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 24.0,
-                                        color: Colors.green)),
-                                SizedBox(height: 10.0),
-                                Divider(),
+
+//                                Text('Bienvenid@',
+//                                    style: TextStyle(
+//                                        fontWeight: FontWeight.w600,
+//                                        fontSize: 24.0,
+//                                        color: Colors.green)),
+//                                SizedBox(height: 10.0),
+//                                Divider(),
                                 TextFormField(
                                     controller: _emailController,
                                     decoration:
@@ -93,14 +99,14 @@ class _LoginPageState extends State<LoginPage> {
                                         child: Text(_login ? 'INGRESAR' : 'CREAR CUENTA',
                                             style: TextStyle(color: Colors.white)),
                                         onPressed: _authenticate,
-                                        color: Colors.green))
+                                        color: GreenMain))
                               ])))),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
                     Text(_login ? '¿Aún no tienes cuenta? ' : '¿Ya tienes cuenta? ',
                         style: TextStyle(color: Colors.white)),
                     InkWell(
                       onTap: toggleLoginToCreateAccount,
-                      child: Text(_login ? 'Registrarte' : 'Inicia Sesión',
+                      child: Text(_login ? 'Regístrate' : 'Inicia Sesión',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     )
                   ]),
@@ -213,5 +219,5 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _goToMyPlants() => Navigator.pushReplacement(context, MaterialPageRoute<bool>(
-  builder: (BuildContext context) => WateredPlantsPage(_userId)));
+  builder: (BuildContext context) => PageManagerPage(_userId)));
 }
