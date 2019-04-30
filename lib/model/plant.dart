@@ -1,4 +1,4 @@
-class WateredPlant {
+class Plant {
   int _id;
   int _minWateringDays;
   int _maxWateringDays;
@@ -7,7 +7,7 @@ class WateredPlant {
   String _name;
   String _image;
 
-  WateredPlant(this._id, this._minWateringDays, this._maxWateringDays,
+  Plant(this._id, this._minWateringDays, this._maxWateringDays,
       this._daysSinceLastDayWatering, this._lastDayWatering, this._name, this._image);
 
   int get id => _id;

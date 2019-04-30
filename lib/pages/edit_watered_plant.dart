@@ -1,52 +1,54 @@
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:wetplant/model/watered_plant.dart';
-import 'package:wetplant/pages/login.dart';
-import 'package:wetplant/pages/watered_plants.dart';
-import 'package:wetplant/util/image_input.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:wetplant/components/custom_scroll_color.dart';
+import 'package:wetplant/components/gradient_material_button.dart';
+import 'package:wetplant/components/image_input.dart';
+import 'package:wetplant/components/reminder_card.dart';
+import 'package:wetplant/constants/available-reminders.dart';
+import 'package:wetplant/constants/colors';
+import 'package:wetplant/model/plant.dart';
+import 'package:wetplant/model/reminder.dart';
+import 'package:wetplant/scoped_model/main_model.dart';
+import 'package:wetplant/util/custom_icons_icons.dart';
+import 'package:wetplant/util/reminder_type.dart';
 
-class EditWateredPlantPage extends StatefulWidget {
-  final WateredPlant wateredPlant;
+class EditPlantPage extends StatefulWidget {
+  final Plant plant;
   final String userId;
 
-  EditWateredPlantPage(this.userId, {this.wateredPlant});
+  EditPlantPage(this.userId, {this.plant});
 
   @override
-  EditWateredPlantPageState createState() {
-    return new EditWateredPlantPageState();
+  EditPlantPageState createState() {
+    return new EditPlantPageState();
   }
 }
 
-class EditWateredPlantPageState extends State<EditWateredPlantPage> {
+class EditPlantPageState extends State<EditPlantPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  Map<ReminderType, Reminder> reminders = Map();
+
   final _nameTextController = TextEditingController(text: '');
   final _minDaysTextController = TextEditingController(text: '7');
   final _maxDaysTextController = TextEditingController(text: '14');
-  final _dateTextController = TextEditingController(text: '');
   File imageFile;
-  String _dateTextToSave = '';
   String _imagePlant = '';
-  String _appBarTitle = 'Nueva plantita';
+  String _appBarTitle = 'NUEVA PLANTA';
   String _waitingMessage = 'Publicando tu nueva plantita';
   bool _waitingAction = false;
-  bool _validate = false;
+  bool _valid = false;
+  RegExp numberRegExp = RegExp(r"^[0-9]*$");
 
   @override
   void initState() {
-    if (widget.wateredPlant != null) {
-      _nameTextController.text = widget.wateredPlant.name;
-      _minDaysTextController.text = widget.wateredPlant.minWateringDays.toString();
-      _maxDaysTextController.text = widget.wateredPlant.maxWateringDays.toString();
-      _imagePlant = widget.wateredPlant.image;
-      _dateTextController.text = formatDate(DateTime.parse(widget.wateredPlant.lastDayWatering));
-      _dateTextToSave = widget.wateredPlant.lastDayWatering;
-      _appBarTitle = 'Editar plantita';
+    if (widget.plant != null) {
+      _nameTextController.text = widget.plant.name;
+      _minDaysTextController.text = widget.plant.minWateringDays.toString();
+      _maxDaysTextController.text = widget.plant.maxWateringDays.toString();
+      _imagePlant = widget.plant.image;
+      _appBarTitle = 'EDITAR PLANTA';
       _waitingMessage = 'Editando tu querida plantita';
     }
     super.initState();
@@ -54,7 +56,6 @@ class EditWateredPlantPageState extends State<EditWateredPlantPage> {
 
   @override
   Widget build(BuildContext context) {
-    RegExp numberRegExp = RegExp(r"^[0-9]*$");
     return _waitingAction
         ? Scaffold(
             body: Center(
@@ -64,191 +65,118 @@ class EditWateredPlantPageState extends State<EditWateredPlantPage> {
             Text(_waitingMessage)
           ])))
         : Scaffold(
-            backgroundColor: Colors.green,
-            appBar: AppBar(actions: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.input),
-                  color: Colors.white,
-                  onPressed: _goToLogin)
-            ],
+            appBar: AppBar(
+              centerTitle: false,
               elevation: 0.0,
-              leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: _goToWetPlantsPage),
               title: Text(_appBarTitle),
             ),
-            body: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-              elevation: 4.0,
-              margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-              child: Form(
+            body: CustomScrollColor(
+                child: ListView(children: <Widget>[
+              Form(
                   key: _formKey,
-                  child: SingleChildScrollView(
+                  child: Container(
                       padding: EdgeInsets.all(15.0),
-                      child: Column(children: <Widget>[
-                        TextFormField(
-                          controller: _nameTextController,
-                          decoration: InputDecoration(helperText: 'Nombre'),
-                          maxLength: 35,
-                          validator: (String value) {
-                            if (value.isEmpty || value.length < 0) return 'Debe tener un nombre';
-                          },
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Flexible(
-                                child: Container(
-                                    padding: EdgeInsets.only(right: 15.0),
-                                    child: TextFormField(
-                                        inputFormatters: [
-                                          WhitelistingTextInputFormatter(numberRegExp)
-                                        ],
-                                        validator: (String value) {
-                                          if (value.isEmpty) return 'No puede ser vacio';
-                                          if (int.parse(value) < 0)
-                                            return 'Debe ser un número mayor a 0';
-                                        },
-                                        controller: _minDaysTextController,
-                                        decoration: InputDecoration(
-                                            helperText: 'Min. Días', counterText: ''),
-                                        maxLength: 2))),
-                            Flexible(
-                                child: Container(
-                                    padding: EdgeInsets.only(left: 15.0),
-                                    child: TextFormField(
-                                        inputFormatters: [
-                                          WhitelistingTextInputFormatter(numberRegExp)
-                                        ],
-                                        validator: (String value) {
-                                          if (value.isEmpty) return 'No puede ser vacio';
-                                          if (int.parse(value) <
-                                              int.parse(_minDaysTextController.text))
-                                            return 'Debe ser mayor a Min. Días';
-                                        },
-                                        controller: _maxDaysTextController,
-                                        decoration: InputDecoration(
-                                            helperText: 'Max. Días', counterText: ''),
-                                        maxLength: 2))),
-                          ],
-                        ),
-                        SizedBox(height: 5.0),
-                        Container(
-                            child: TextField(
-                                enableInteractiveSelection: false,
-                                focusNode: FocusNode(),
-                                onTap: () => _selectDate(context),
-                                controller: _dateTextController,
-                                decoration: InputDecoration(
-                                  helperText: 'Último día de regado',
-                                  errorText: _validate ? 'Debes ingresar una fecha' : null,
-                                ))),
-                        SizedBox(height: 5.0),
-                        ImageInput(setImageFile, _imagePlant),
-                        Container(
-                            width: double.infinity,
-                            child: RaisedButton(
-                                color: Colors.green,
-                                onPressed: widget.wateredPlant == null
-                                    ? _saveNewWateredPlant
-                                    : _updateWateredPlant,
-                                child: Text('Guardar', style: TextStyle(color: Colors.white))))
-                      ]))),
-            ));
+                      child:
+                          Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                        ImageInput(onSave: (setImageFile, _imagePlant) {}),
+                        _buildPlantNameField(),
+                        SizedBox(height: 20.0),
+                        Text('RECORDATORIOS',
+                            style: TextStyle(color: Colors.black45, fontSize: 16)),
+                        _valid
+                            ? Text('Selecciona almenos un recordatorio.',
+                                style: TextStyle(color: Colors.red, fontSize: 10.0))
+                            : Container(),
+                        _buildGridReminders(),
+                        _buildCreateEditPlantButton()
+                      ])))
+            ])));
+  }
+
+  _addReminders(Reminder reminder) => reminders[reminder.reminderType] = reminder;
+
+  _deleteReminder(Reminder reminder) => reminders.remove(reminder.reminderType);
+
+  Widget _buildPlantNameField() {
+    return TextFormField(
+      controller: _nameTextController,
+      decoration: InputDecoration(helperText: 'Nombre'),
+      maxLength: 35,
+      validator: (String value) {
+        if (value.isEmpty || value.length < 0) return 'Debe tener un nombre';
+      },
+    );
+  }
+
+  Widget _buildGridReminders() {
+    return Container(
+        padding: EdgeInsets.only(top: 24),
+        child: GridView.count(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            shrinkWrap: true,
+            childAspectRatio: 1.6,
+            primary: false,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 12.0,
+            crossAxisCount: 2,
+            children: availableReminders.map((availableReminder) {
+              return ReminderCard(
+                  availableReminder, (r) => _addReminders(r), (r) => _deleteReminder(r));
+            }).toList()));
+  }
+
+  Widget _buildCreateEditPlantButton() {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Container(
+        margin: EdgeInsets.fromLTRB(0, 24, 0, 24),
+        child: GradientButton(
+            shadow: true,
+            gradient: GreenGradient,
+            height: 60,
+            buttonRadius: BorderRadius.all(Radius.circular(8)),
+            onPressed: () {
+              _saveNewWateredPlant(model);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'AGREGAR PLANTA',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ],
+            )),
+      );
+    });
   }
 
   setImageFile(File imageFileSource) {
     imageFile = imageFileSource;
   }
 
-  DateTime today = DateTime.now();
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context, initialDate: today, firstDate: DateTime(2018), lastDate: today);
-
-    if (picked != null)
-      setState(() {
-        _dateTextController.text = formatDate(picked);
-        _dateTextToSave = picked.toIso8601String();
-        _validate = false;
-      });
-  }
-
-  String formatDate(DateTime date) {
-    String day = date.day < 10 ? '0' + date.day.toString() : date.day.toString();
-    String month = date.month < 10 ? '0' + date.month.toString() : date.month.toString();
-    return '$day-$month-${date.year.toString()}';
-  }
-
-  _saveNewWateredPlant() async {
+  _saveNewWateredPlant(MainModel model) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
-    if (_dateTextToSave.isEmpty) {
-      _validate = true;
+    if (reminders.isEmpty) {
+      setState(() {
+        _valid = true;
+      });
+      return;
+    } else {
+      _valid = false;
     }
     setState(() {
       _waitingAction = true;
     });
     Map<String, dynamic> jsonWateredPlant = {
       'userId': widget.userId,
-      'lastDayWatering': _dateTextToSave,
       'minWateringDays': _minDaysTextController.text,
       'maxWateringDays': _maxDaysTextController.text,
       'name': _nameTextController.text
     };
-    http.Response res = await http.post("http://192.168.1.40:8080/wateredplant/",
-        body: jsonEncode(jsonWateredPlant), headers: {'Content-Type': 'application/json'});
-    await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
-    _goToWetPlantsPage();
-  }
-
-  _updateWateredPlant() async {
-    if (!_formKey.currentState.validate()) {
-      return;
-    }
-    if (_dateTextToSave.isEmpty) {
-      _validate = true;
-    }
-    setState(() {
-      _waitingAction = true;
-    });
-    Map<String, dynamic> jsonWateredPlant = {
-      'id': widget.wateredPlant.id.toString(),
-      'userId': widget.userId,
-      'lastDayWatering': _dateTextToSave,
-      'minWateringDays': _minDaysTextController.text,
-      'maxWateringDays': _maxDaysTextController.text,
-      'name': _nameTextController.text,
-      'image': _imagePlant
-    };
-    http.Response res = await http.put("http://192.168.1.40:8080/wateredplant/",
-        body: jsonEncode(jsonWateredPlant), headers: {'Content-Type': 'application/json'});
-    if (imageFile != null) {
-      await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
-    }
-    _goToWetPlantsPage();
-  }
-
-  Future<http.StreamedResponse> _addImage(String id, File image) {
-    var url = Uri.parse("http://192.168.1.40:8080/wateredplant/image");
-    var request = new http.MultipartRequest("POST", url);
-    request.headers['content-type'] = 'multipart/form-data';
-    request.fields['id'] = id;
-    request.files.add(new http.MultipartFile.fromBytes("image", image.readAsBytesSync(),
-        contentType: MediaType.parse('multipart/form-data'), filename: 'image'));
-    return request.send();
-  }
-
-  _goToLogin(){
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-      return LoginPage();
-    }));
-  }
-
-  _goToWetPlantsPage() {
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute<bool>(
-            builder: (BuildContext context) => WateredPlantsPage(widget.userId)));
+//    model.addNewPlant(jsonWateredPlant, imageFile);
+//    _goToWetPlantsPage();
   }
 }

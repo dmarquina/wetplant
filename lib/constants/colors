@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-const GreenMain = Color.fromRGBO(50, 190, 120, 1);
-const GreenSecondMain = Color.fromRGBO(60, 220, 150, 1);
+const GreenMain = Color.fromRGBO(50, 200, 120, 1);
+const GreenSecondMain = Color.fromRGBO(120, 220, 110, 1);
 
 const GreenGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  stops: [0, 1],
+  stops: [0, 0.9],
   colors: [
     GreenMain,
     GreenSecondMain
@@ -51,6 +51,8 @@ const RedGradient = LinearGradient(
     RedSecond
   ],
 );
+
+const GreyInactive = Colors.grey;
 
 const GreyGradient = LinearGradient(
   stops: [1],

@@ -8,7 +8,7 @@ class PageTitle extends StatelessWidget {
   PageTitle({
     this.title,
     this.fontSize = 60,
-    this.padding = const EdgeInsets.fromLTRB(0, 0, 0, 25)
+    this.padding = const EdgeInsets.fromLTRB(0, 20, 0, 25)
   });
 
   @override

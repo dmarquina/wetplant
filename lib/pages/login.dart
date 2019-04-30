@@ -4,7 +4,7 @@ import 'package:wetplant/constants/colors';
 import 'package:wetplant/pages/page_manager.dart';
 import 'dart:convert';
 
-import 'package:wetplant/pages/watered_plants.dart';
+import 'package:wetplant/pages/plants.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
 
 class LoginPage extends StatefulWidget {

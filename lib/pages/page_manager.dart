@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:wetplant/components/fab_bottom_app_bar.dart';
-import 'package:wetplant/pages/today.dart';
-import 'package:wetplant/pages/watered_plants.dart';
 import 'package:wetplant/constants/colors';
+import 'package:wetplant/pages/edit_watered_plant.dart';
+import 'package:wetplant/pages/garden.dart';
+import 'package:wetplant/pages/today.dart';
 
 class PageManagerPage extends StatefulWidget {
   final String userId;
@@ -15,10 +16,7 @@ class PageManagerPage extends StatefulWidget {
 
 class _PageManagerPageState extends State<PageManagerPage> {
   int _selectedIndex = 0;
-  final _widgetOptions = [
-    TodayPage(),
-    WateredPlantsPage('sSMpDLjiadWuE10CVQiRrGCJI6w2')
-  ];
+  final _widgetOptions = [TodayPage(), GardenPage()];
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,12 @@ class _PageManagerPageState extends State<PageManagerPage> {
         ),
         floatingActionButton: FloatingActionButton(
             backgroundColor: GreenMain,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (BuildContext context) {
+                return EditPlantPage(widget.userId);
+              }));
+            },
             child: Icon(
               Icons.add,
               color: Colors.white,
