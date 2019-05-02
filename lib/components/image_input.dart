@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:wetplant/constants/colors';
 
 class ImageInput extends StatefulWidget {
-  final Function(File, ImageSourceType) onSave;
+  final Function(File) onSave;
 
   ImageInput({@required this.onSave});
 
@@ -91,7 +91,7 @@ class ImageInputState extends State<ImageInput> {
   Widget build(BuildContext context) {
     return FormField(
       onSaved: (File file) {
-        widget.onSave(file, _imageSourceType);
+        widget.onSave(file);
       },
       validator: (value) {
         return value == null ? 'Selecciona o toma una foto' : null;

@@ -43,21 +43,26 @@ class PlantCard extends StatelessWidget {
   }
 
   Widget _buildPlantInfo() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      _buildWaterPlantInfo()
-//        , _buildFertilizePlantInfo()
-    ]);
+    return Expanded(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(right: 10.0),
+        scrollDirection: Axis.horizontal,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[_buildWaterPlantInfo(), _buildFertilizePlantInfo()]),
+      ),
+    );
   }
 
   Widget _buildWaterPlantInfo() {
     return Row(
       children: <Widget>[
         Container(child: Icon(CustomIcons.water_amount_small, color: ReminderBlueMain, size: 60)),
-        Icon(Icons.autorenew, color: Colors.black54),
-        Text('$minDays d', style: TextStyle(color: Colors.black54)),
-        SizedBox(width: 20.0),
         Icon(Icons.access_time, color: Colors.black54),
-        Text('$actualDays d', style: TextStyle(color: Colors.black54))
+        Text('$actualDays d', style: TextStyle(color: Colors.black54)),
+        SizedBox(width: 20.0),
+        Icon(Icons.autorenew, color: Colors.black54),
+        Text('$minDays d', style: TextStyle(color: Colors.black54))
       ],
     );
   }
@@ -67,11 +72,11 @@ class PlantCard extends StatelessWidget {
       Container(
           padding: EdgeInsets.symmetric(horizontal: 10.0),
           child: Icon(Icons.flash_on, color: BrownMain, size: 40)),
-      Icon(Icons.autorenew),
-      Text('60 d'),
+      Icon(Icons.access_time, color: Colors.black54),
+      Text('35 d', style: TextStyle(color: Colors.black54)),
       SizedBox(width: 20.0),
-      Icon(Icons.access_time),
-      Text('35 d')
+      Icon(Icons.autorenew, color: Colors.black54),
+      Text('60 d', style: TextStyle(color: Colors.black54))
     ]);
   }
 

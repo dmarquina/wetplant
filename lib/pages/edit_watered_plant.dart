@@ -11,14 +11,12 @@ import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/plant.dart';
 import 'package:wetplant/model/reminder.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
-import 'package:wetplant/util/custom_icons_icons.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
 class EditPlantPage extends StatefulWidget {
   final Plant plant;
-  final String userId;
 
-  EditPlantPage(this.userId, {this.plant});
+  EditPlantPage({this.plant});
 
   @override
   EditPlantPageState createState() {
@@ -28,12 +26,12 @@ class EditPlantPage extends StatefulWidget {
 
 class EditPlantPageState extends State<EditPlantPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Map<ReminderType, Reminder> reminders = Map();
+  Map<ReminderType, Reminder> _reminders = Map();
 
   final _nameTextController = TextEditingController(text: '');
   final _minDaysTextController = TextEditingController(text: '7');
   final _maxDaysTextController = TextEditingController(text: '14');
-  File imageFile;
+  File _imageFile;
   String _imagePlant = '';
   String _appBarTitle = 'NUEVA PLANTA';
   String _waitingMessage = 'Publicando tu nueva plantita';
@@ -47,7 +45,7 @@ class EditPlantPageState extends State<EditPlantPage> {
       _nameTextController.text = widget.plant.name;
       _minDaysTextController.text = widget.plant.minWateringDays.toString();
       _maxDaysTextController.text = widget.plant.maxWateringDays.toString();
-      _imagePlant = widget.plant.image;
+//      _imagePlant = widget.plant.image;
       _appBarTitle = 'EDITAR PLANTA';
       _waitingMessage = 'Editando tu querida plantita';
     }
@@ -78,7 +76,9 @@ class EditPlantPageState extends State<EditPlantPage> {
                       padding: EdgeInsets.all(15.0),
                       child:
                           Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                        ImageInput(onSave: (setImageFile, _imagePlant) {}),
+                        ImageInput(onSave: (File imageFileSource) {
+                          _setImageFile(imageFileSource);
+                        }),
                         _buildPlantNameField(),
                         SizedBox(height: 20.0),
                         Text('RECORDATORIOS',
@@ -93,9 +93,9 @@ class EditPlantPageState extends State<EditPlantPage> {
             ])));
   }
 
-  _addReminders(Reminder reminder) => reminders[reminder.reminderType] = reminder;
+  _addReminders(Reminder reminder) => _reminders[reminder.reminderType] = reminder;
 
-  _deleteReminder(Reminder reminder) => reminders.remove(reminder.reminderType);
+  _deleteReminder(Reminder reminder) => _reminders.remove(reminder.reminderType);
 
   Widget _buildPlantNameField() {
     return TextFormField(
@@ -103,7 +103,7 @@ class EditPlantPageState extends State<EditPlantPage> {
       decoration: InputDecoration(helperText: 'Nombre'),
       maxLength: 35,
       validator: (String value) {
-        if (value.isEmpty || value.length < 0) return 'Debe tener un nombre';
+        if (value.isEmpty || value.length < 0) return 'Tu planta debe tener un nombre';
       },
     );
   }
@@ -151,15 +151,15 @@ class EditPlantPageState extends State<EditPlantPage> {
     });
   }
 
-  setImageFile(File imageFileSource) {
-    imageFile = imageFileSource;
+  _setImageFile(File imageFileSource) {
+    _imageFile = imageFileSource;
   }
 
   _saveNewWateredPlant(MainModel model) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
-    if (reminders.isEmpty) {
+    if (_reminders.isEmpty) {
       setState(() {
         _valid = true;
       });
@@ -167,13 +167,17 @@ class EditPlantPageState extends State<EditPlantPage> {
     } else {
       _valid = false;
     }
-    setState(() {
-      _waitingAction = true;
-    });
+//    setState(() {
+//      _waitingAction = true;
+//    });
+    print(_reminders);
+    print(_nameTextController.text);
+    print(model.ownerId);
+    print(_imageFile);
     Map<String, dynamic> jsonWateredPlant = {
-      'userId': widget.userId,
-      'minWateringDays': _minDaysTextController.text,
-      'maxWateringDays': _maxDaysTextController.text,
+      'ownerId': model.ownerId,
+//      'minWateringDays': _minDaysTextController.text,
+//      'maxWateringDays': _maxDaysTextController.text,
       'name': _nameTextController.text
     };
 //    model.addNewPlant(jsonWateredPlant, imageFile);

@@ -6,10 +6,6 @@ import 'package:wetplant/pages/garden.dart';
 import 'package:wetplant/pages/today.dart';
 
 class PageManagerPage extends StatefulWidget {
-  final String userId;
-
-  PageManagerPage(this.userId);
-
   @override
   _PageManagerPageState createState() => _PageManagerPageState();
 }
@@ -27,9 +23,8 @@ class _PageManagerPageState extends State<PageManagerPage> {
         floatingActionButton: FloatingActionButton(
             backgroundColor: GreenMain,
             onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (BuildContext context) {
-                return EditPlantPage(widget.userId);
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+                return EditPlantPage();
               }));
             },
             child: Icon(
