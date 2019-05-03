@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:wetplant/constants/available-reminders.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/plant.dart';
 import 'package:wetplant/model/reminder.dart';
+import 'package:wetplant/pages/page_manager.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
@@ -29,8 +31,6 @@ class EditPlantPageState extends State<EditPlantPage> {
   Map<ReminderType, Reminder> _reminders = Map();
 
   final _nameTextController = TextEditingController(text: '');
-  final _minDaysTextController = TextEditingController(text: '7');
-  final _maxDaysTextController = TextEditingController(text: '14');
   File _imageFile;
   String _imagePlant = '';
   String _appBarTitle = 'NUEVA PLANTA';
@@ -43,8 +43,6 @@ class EditPlantPageState extends State<EditPlantPage> {
   void initState() {
     if (widget.plant != null) {
       _nameTextController.text = widget.plant.name;
-      _minDaysTextController.text = widget.plant.minWateringDays.toString();
-      _maxDaysTextController.text = widget.plant.maxWateringDays.toString();
 //      _imagePlant = widget.plant.image;
       _appBarTitle = 'EDITAR PLANTA';
       _waitingMessage = 'Editando tu querida plantita';
@@ -167,20 +165,24 @@ class EditPlantPageState extends State<EditPlantPage> {
     } else {
       _valid = false;
     }
-//    setState(() {
-//      _waitingAction = true;
-//    });
-    print(_reminders);
-    print(_nameTextController.text);
-    print(model.ownerId);
-    print(_imageFile);
-    Map<String, dynamic> jsonWateredPlant = {
+    setState(() {
+      _waitingAction = true;
+    });
+    Map<String, dynamic> jsonNewPlant = {
       'ownerId': model.ownerId,
-//      'minWateringDays': _minDaysTextController.text,
-//      'maxWateringDays': _maxDaysTextController.text,
-      'name': _nameTextController.text
+      'name': _nameTextController.text,
+      'reminders': _getJsonReminders(_reminders)
     };
-//    model.addNewPlant(jsonWateredPlant, imageFile);
-//    _goToWetPlantsPage();
+    await model.addNewPlant(jsonNewPlant, _imageFile);
+    Navigator.pop(context);
+  }
+
+  List<Map<String,dynamic>> _getJsonReminders(Map reminders) {
+    return reminders.values.map((reminder) =>
+    {
+      'name': reminder.reminderType == ReminderType.Water ? 'water' : 'fertilaze',
+      'frequencyDays': reminder.frequencyDays,
+      'lastDayAction': reminder.pickedDate.toIso8601String(),
+    }).toList();
   }
 }

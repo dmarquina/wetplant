@@ -106,8 +106,7 @@ class ImageInputState extends State<ImageInput> {
                     GestureDetector(
                       onTap: () async {
                         File image = await _getImageFromGallery();
-                        imageForm.setValue(image);
-                        imageForm.setState(() {});
+                        _checkFileCorrectSize(imageForm, image);
                       },
                       child: _getGalleryContainer(imageForm),
                     ),
@@ -124,8 +123,7 @@ class ImageInputState extends State<ImageInput> {
                         GestureDetector(
                           onTap: () async {
                             File image = await _getImageFromCamera();
-                            imageForm.setValue(image);
-                            imageForm.setState(() {});
+                            _checkFileCorrectSize(imageForm, image);
                           },
                           child: _getCameraContainer(imageForm),
                         ),
@@ -139,5 +137,41 @@ class ImageInputState extends State<ImageInput> {
         );
       },
     );
+  }
+
+  _checkFileCorrectSize(FormFieldState<dynamic> imageForm, File image) {
+    if (image.lengthSync() <= 1000000) {
+      widget.onSave(image);
+      imageForm.setValue(image);
+      imageForm.setState(() {});
+    } else {
+      _openDialogImageSizeExceeded();
+    }
+  }
+
+  _openDialogImageSizeExceeded() {
+    showDialog(
+        context: context,
+        builder: (_) => SimpleDialog(
+                contentPadding: EdgeInsets.all(0),
+                title: Text('ESPERA', style: TextStyle(fontSize: 18.0)),
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(top: 10.0, left: 25.0, right: 25.0),
+                      child:
+                          Text('Esta imagen supera el tamaño de 1MB permitido, selecciona otra')),
+                  ButtonBar(
+                    children: <Widget>[
+                      FlatButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('ENTIENDO'),
+                      ),
+                    ],
+                  )
+                ]));
   }
 }

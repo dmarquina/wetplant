@@ -176,8 +176,10 @@ class _ReminderCardState extends State<ReminderCard> {
   }
 
   _addReminder() {
-    Reminder newReminder =
-        Reminder(widget.availableReminder.reminderType, datePicked, frequencyDays);
+    Reminder newReminder = Reminder(
+        reminderType: widget.availableReminder.reminderType,
+        pickedDate: datePicked,
+        frequencyDays: frequencyDays);
     widget.addReminder(newReminder);
     setState(() {
       _remindersSelected[widget.availableReminder.reminderType] = true;
@@ -186,8 +188,10 @@ class _ReminderCardState extends State<ReminderCard> {
   }
 
   _deleteReminder() {
-    Reminder reminderToDelete =
-        Reminder(widget.availableReminder.reminderType, datePicked, frequencyDays);
+    Reminder reminderToDelete = Reminder(
+        reminderType: widget.availableReminder.reminderType,
+        pickedDate: datePicked,
+        frequencyDays: frequencyDays);
     widget.deleteReminder(reminderToDelete);
     setState(() {
       _initValues();

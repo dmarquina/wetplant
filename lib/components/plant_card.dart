@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:wetplant/constants/colors';
+import 'package:wetplant/model/reminder.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
+import 'package:wetplant/util/reminder_type.dart';
 
 class PlantCard extends StatelessWidget {
   final int plantId;
   final String plantName;
   final String plantImage;
-  final int minDays;
-  final int actualDays;
+  final List<Reminder> reminders;
 
-  PlantCard(this.plantId, this.plantName, this.plantImage, this.minDays, this.actualDays);
+  PlantCard(this.plantId, this.plantName, this.plantImage, this.reminders);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class PlantCard extends StatelessWidget {
         width: 130,
         decoration: BoxDecoration(
             color: Colors.black12,
-            image: DecorationImage(image: NetworkImage(plantImage), fit: BoxFit.cover),
+            image: DecorationImage(image: NetworkImage(plantImage ?? ''), fit: BoxFit.cover),
             borderRadius: BorderRadius.only(topLeft: Radius.circular(5))));
   }
 
@@ -49,35 +50,33 @@ class PlantCard extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[_buildWaterPlantInfo(), _buildFertilizePlantInfo()]),
+            children: reminders.map((reminder) => _buildReminderInfo(reminder)).toList()),
       ),
     );
   }
 
-  Widget _buildWaterPlantInfo() {
+  Widget _buildReminderInfo(Reminder reminder) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Container(child: Icon(CustomIcons.water_amount_small, color: ReminderBlueMain, size: 60)),
+        Container(child: _buildReminderIcon(reminder.reminderType)),
         Icon(Icons.access_time, color: Colors.black54),
-        Text('$actualDays d', style: TextStyle(color: Colors.black54)),
+        Text('${reminder.daysRemainingForAction} d', style: TextStyle(color: Colors.black54)),
         SizedBox(width: 20.0),
         Icon(Icons.autorenew, color: Colors.black54),
-        Text('$minDays d', style: TextStyle(color: Colors.black54))
+        Text('${reminder.frequencyDays} d', style: TextStyle(color: Colors.black54))
       ],
     );
   }
 
-  Widget _buildFertilizePlantInfo() {
-    return Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-      Container(
+  Widget _buildReminderIcon(ReminderType reminderType) {
+    if (reminderType == ReminderType.Water) {
+      return Icon(CustomIcons.water_amount_small, color: ReminderBlueMain, size: 60);
+    } else {
+      return Container(
           padding: EdgeInsets.symmetric(horizontal: 10.0),
-          child: Icon(Icons.flash_on, color: BrownMain, size: 40)),
-      Icon(Icons.access_time, color: Colors.black54),
-      Text('35 d', style: TextStyle(color: Colors.black54)),
-      SizedBox(width: 20.0),
-      Icon(Icons.autorenew, color: Colors.black54),
-      Text('60 d', style: TextStyle(color: Colors.black54))
-    ]);
+          child: Icon(Icons.flash_on, color: BrownMain, size: 40));
+    }
   }
 
   Widget _buildPlantNameBox() {

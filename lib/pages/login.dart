@@ -182,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
         final Map<String, dynamic> responseData = json.decode(res.body);
         Map<String, dynamic> successInformation = _checkAuthenticate(responseData,model);
         if (successInformation['success']) {
-          _goToMyPlants();
+          _goToPlantsManagerPage();
         } else {
           showDialog(
               context: context,
@@ -226,6 +226,6 @@ class _LoginPageState extends State<LoginPage> {
     return {'success': !hasError, 'message': message};
   }
 
-  _goToMyPlants() => Navigator.pushReplacement(context,
+  _goToPlantsManagerPage() => Navigator.pushReplacement(context,
       MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage()));
 }
