@@ -32,10 +32,10 @@ const YellowSecond = Color.fromRGBO(255, 178, 127, 1);
 const YellowGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  stops: [0.1, 0.9],
+  stops: [0.5, 0.9],
   colors: [
-    YellowMain,
-    YellowSecond
+    YellowSecond,
+    YellowMain
   ],
 );
 

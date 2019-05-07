@@ -36,12 +36,12 @@ class _ReminderCardState extends State<ReminderCard> {
       onLongPress: () => _openDeleteReminderDialog(context),
       child: Container(
         width: 180,
-        margin: EdgeInsets.fromLTRB(0, 0, 16, 8),
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 8),
         decoration: _buildCardBoxDecoration(),
         child: Material(
             color: Colors.transparent,
             child: InkWell(
-                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 onTap: () {
                   _openDialog(context);
                 },
@@ -71,19 +71,6 @@ class _ReminderCardState extends State<ReminderCard> {
     );
   }
 
-  Widget _buildReminderInfo() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(Icons.access_time, size: 10),
-        Text('12 días', style: TextStyle(fontSize: 11.0)),
-        SizedBox(width: 10.0),
-        Icon(Icons.autorenew, size: 10),
-        Text('7 días', style: TextStyle(fontSize: 11.0))
-      ],
-    );
-  }
-
   _openDialog(BuildContext context) {
     showDialog(
         context: context,
@@ -92,33 +79,43 @@ class _ReminderCardState extends State<ReminderCard> {
                 title: Text('RECORDATORIO DE ${widget.availableReminder.title.toUpperCase()}',
                     style: TextStyle(fontSize: 18.0)),
                 children: <Widget>[
+                  Container(width: MediaQuery.of(context).size.width),
                   Container(
-                    width: MediaQuery.of(context).size.width,
-                  ),
-                  LastActionDate(widget.availableReminder.accentColor, (date) {
-                    datePicked = date;
-                  }, datePicked ?? DateTime.now()),
+                      alignment: Alignment.center,
+                      margin: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text('¿Cuándo fue la última vez?',
+                          style: TextStyle(color: Colors.black54, fontSize: 16))),
+                  SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                        LastActionDate(
+                            widget.availableReminder.accentColor, datePicked ?? DateTime.now(),
+                            (date) {
+                          datePicked = date;
+                        })
+                      ])),
                   FrequencyDays(
-                    onChange: (int frequency) {
-                      frequencyDays = frequency;
-                    },
-                    initialValue: frequencyDays,
-                    type: widget.availableReminder.title,
-                    color: widget.availableReminder.accentColor,
-                  ),
-                  ButtonBar(
-                    children: <Widget>[
-                      FlatButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('CANCELAR'),
-                      ),
-                      _buildAddButton()
-                    ],
-                  )
+                      onChange: (int frequency) {
+                        frequencyDays = frequency;
+                      },
+                      initialValue: frequencyDays,
+                      type: "${widget.availableReminder.title} cada",
+                      color: widget.availableReminder.accentColor),
+                  SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                        ButtonBar(children: <Widget>[
+                          FlatButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(8))),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('CANCELAR'),
+                          ),
+                          _buildAddButton()
+                        ])
+                      ]))
                 ]));
   }
 
@@ -178,7 +175,7 @@ class _ReminderCardState extends State<ReminderCard> {
   _addReminder() {
     Reminder newReminder = Reminder(
         reminderType: widget.availableReminder.reminderType,
-        pickedDate: datePicked,
+        lastDateAction: datePicked,
         frequencyDays: frequencyDays);
     widget.addReminder(newReminder);
     setState(() {
@@ -190,7 +187,7 @@ class _ReminderCardState extends State<ReminderCard> {
   _deleteReminder() {
     Reminder reminderToDelete = Reminder(
         reminderType: widget.availableReminder.reminderType,
-        pickedDate: datePicked,
+        lastDateAction: datePicked,
         frequencyDays: frequencyDays);
     widget.deleteReminder(reminderToDelete);
     setState(() {

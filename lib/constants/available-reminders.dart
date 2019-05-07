@@ -33,3 +33,7 @@ List<AvailableReminder> availableReminders = [
   availableWaterReminder,
   availableFertilizeReminder,
 ];
+
+AvailableReminder getAvailableReminderByType(ReminderType reminderType) {
+  return reminderType == ReminderType.Water ? availableWaterReminder : availableFertilizeReminder;
+}

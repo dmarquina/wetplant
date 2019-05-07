@@ -1,24 +1,31 @@
 import 'package:wetplant/util/reminder_type.dart';
 
 class Reminder {
+  int id;
   ReminderType reminderType;
-  DateTime pickedDate;
+  DateTime lastDateAction;
   int frequencyDays;
   int postponedDays;
   int daysRemainingForAction;
+  int daysWithoutAction;
 
   Reminder(
-      {this.reminderType,
-      this.pickedDate,
+      {this.id,
+      this.reminderType,
+      this.lastDateAction,
       this.frequencyDays,
       this.postponedDays,
-      this.daysRemainingForAction});
+      this.daysRemainingForAction,
+      this.daysWithoutAction});
 
   factory Reminder.fromJson(Map<String, dynamic> json) {
     return Reminder(
+        id: json['id'],
         reminderType: json['name'] == 'water' ? ReminderType.Water : ReminderType.Fertilize,
-        pickedDate: DateTime.parse(json['lastDayAction']),
+        lastDateAction: DateTime.parse(json['lastDateAction']),
         frequencyDays: json['frequencyDays'],
-        daysRemainingForAction: json['daysRemainingForAction']);
+        postponedDays: json['postponedDays'],
+        daysRemainingForAction: json['daysRemainingForAction'],
+        daysWithoutAction: json['daysWithoutAction']);
   }
 }

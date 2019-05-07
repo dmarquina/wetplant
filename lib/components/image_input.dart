@@ -21,7 +21,7 @@ class ImageInputState extends State<ImageInput> {
   ImageSourceType _imageSourceType = ImageSourceType.Camera;
 
   Future<File> _getImageFromCamera() async {
-    var value = await ImagePicker.pickImage(source: ImageSource.camera);
+    var value = await ImagePicker.pickImage(source: ImageSource.camera,maxHeight: 500.0);
     setState(() {
       _imageSourceType = ImageSourceType.Camera;
     });
@@ -29,7 +29,7 @@ class ImageInputState extends State<ImageInput> {
   }
 
   Future<File> _getImageFromGallery() async {
-    var value = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var value = await ImagePicker.pickImage(source: ImageSource.gallery,maxHeight: 500.0);
     setState(() {
       _imageSourceType = ImageSourceType.Gallery;
     });
@@ -140,6 +140,7 @@ class ImageInputState extends State<ImageInput> {
   }
 
   _checkFileCorrectSize(FormFieldState<dynamic> imageForm, File image) {
+    print(image.lengthSync());
     if (image.lengthSync() <= 1000000) {
       widget.onSave(image);
       imageForm.setValue(image);

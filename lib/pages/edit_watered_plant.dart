@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:wetplant/constants/available-reminders.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/plant.dart';
 import 'package:wetplant/model/reminder.dart';
-import 'package:wetplant/pages/page_manager.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
@@ -182,7 +180,7 @@ class EditPlantPageState extends State<EditPlantPage> {
     {
       'name': reminder.reminderType == ReminderType.Water ? 'water' : 'fertilaze',
       'frequencyDays': reminder.frequencyDays,
-      'lastDayAction': reminder.pickedDate.toIso8601String(),
+      'lastDateAction': reminder.lastDateAction.toIso8601String(),
     }).toList();
   }
 }

@@ -97,7 +97,7 @@ class FrequencyDays extends StatelessWidget {
             frequencyFrom.setValue(value);
             frequencyFrom.setState(() {});
           },
-          type: '$type cada',
+          type: '$type',
         );
       },
     );

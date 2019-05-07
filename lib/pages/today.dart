@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/components/custom_scroll_color.dart';
 import 'package:wetplant/components/no_flowers_to_water.dart';
 import 'package:wetplant/components/page_title.dart';
+import 'package:wetplant/components/today_plant_card.dart';
+import 'package:wetplant/scoped_model/main_model.dart';
 
 class TodayPage extends StatefulWidget {
   @override
@@ -11,19 +14,30 @@ class TodayPage extends StatefulWidget {
 class _TodayPageState extends State<TodayPage> {
   @override
   Widget build(BuildContext context) {
-    return CustomScrollColor(
-        child: ListView(
-      children: <Widget>[
-        PageTitle(title: 'Hoy', padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20)),
-        Padding(
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return CustomScrollColor(
+          child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              child: ListView(children: _buildPage(model))));
+    });
+  }
+
+  List<Widget> _buildPage(MainModel model) {
+    List<Widget> children = List();
+    children.add(PageTitle(title: 'Hoy', padding: EdgeInsets.symmetric(vertical: 20)));
+    if (model.todayPlants.isEmpty) {
+      children.add(Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: NoFlowersToWater(hasNoFlowers: true, hasCompleted: true),
-        ),
-        Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: PageTitle(
-                title: 'Atentidas', fontSize: 40, padding: EdgeInsets.fromLTRB(0, 20, 0, 16)))
-      ],
-    ));
+          child: NoFlowersToWater(hasNoFlowers: true, hasCompleted: true)));
+    } else {
+      children.add(_buildTodayPlants(model));
+    }
+    return children;
+  }
+
+  Widget _buildTodayPlants(MainModel model) {
+    return Column(
+        children: model.todayPlants.map((gp) => TodayPlantCard(gp.plant, gp.reminders)).toList());
   }
 }

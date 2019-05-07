@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/util/date_util.dart';
 
-
-
 class LastActionDate extends StatefulWidget {
   final Color color;
-  final Function(DateTime) pickDate;
   final DateTime initValue;
+  final Function(DateTime) pickDate;
+  DateTime lastTimeAction;
 
-  LastActionDate(this.color, this.pickDate, this.initValue);
+  LastActionDate(this.color, this.initValue, this.pickDate, {this.lastTimeAction});
 
   @override
   _LastActionDateState createState() => _LastActionDateState();
@@ -21,16 +20,15 @@ class _LastActionDateState extends State<LastActionDate> {
   DateTime today = DateTime.now();
   String dateSelected;
 
-
   @override
   void initState() {
-    if (!checkDatesAreEquals(widget.initValue,today)) {
-      if (checkDatesAreEquals(widget.initValue,yesterday)) {
+    if (!checkDatesAreEquals(widget.initValue, today)) {
+      if (checkDatesAreEquals(widget.initValue, yesterday)) {
         _pickDate(yesterday, LastActionDates.yesterday);
       } else {
         _pickDate(widget.initValue, LastActionDates.date);
       }
-    }else{
+    } else {
       _pickDate(today, LastActionDates.today);
     }
     super.initState();
@@ -41,42 +39,44 @@ class _LastActionDateState extends State<LastActionDate> {
     return Container(
         padding: EdgeInsets.symmetric(horizontal: 2.0),
         child: Column(children: <Widget>[
-          Container(
-              alignment: Alignment.center,
-              margin: EdgeInsets.symmetric(vertical: 10.0),
-              child: Text('¿Cuándo fue la última vez?',
-                  style: TextStyle(color: Colors.black54, fontSize: 16))),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              FlatButton(
-                  onPressed: () => _pickDate(yesterday, LastActionDates.yesterday),
-                  color:
-                      lastDateSelected == LastActionDates.yesterday ? widget.color : GreyInactive,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.horizontal(left: Radius.circular(20))),
-                  child: Text('Ayer', style: TextStyle(color: Colors.white))),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 1.0),
-                child: FlatButton(
-                    onPressed: () => _pickDate(today, LastActionDates.today),
-                    color: lastDateSelected == LastActionDates.today ? widget.color : GreyInactive,
-                    child: Text('Hoy', style: TextStyle(color: Colors.white))),
-              ),
-              FlatButton(
-                  onPressed: () => _selectDate(context),
-                  color: lastDateSelected == LastActionDates.date ? widget.color : GreyInactive,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.horizontal(right: Radius.circular(20))),
-                  child: Text(dateSelected ?? 'Otra Fecha', style: TextStyle(color: Colors.white))),
-            ],
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                FlatButton(
+                    onPressed: () => _pickDate(yesterday, LastActionDates.yesterday),
+                    color:
+                        lastDateSelected == LastActionDates.yesterday ? widget.color : GreyInactive,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.horizontal(left: Radius.circular(20))),
+                    child: Text('Ayer', style: TextStyle(color: Colors.white))),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 1.0),
+                  child: FlatButton(
+                      onPressed: () => _pickDate(today, LastActionDates.today),
+                      color:
+                          lastDateSelected == LastActionDates.today ? widget.color : GreyInactive,
+                      child: Text('Hoy', style: TextStyle(color: Colors.white))),
+                ),
+                FlatButton(
+                    onPressed: () => _selectDate(context),
+                    color: lastDateSelected == LastActionDates.date ? widget.color : GreyInactive,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.horizontal(right: Radius.circular(20))),
+                    child:
+                        Text(dateSelected ?? 'Otra Fecha', style: TextStyle(color: Colors.white))),
+              ],
+            ),
           ),
         ]));
   }
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
-        context: context, initialDate: today, firstDate: DateTime(2018), lastDate: today);
+        context: context,
+        initialDate: today,
+        firstDate: widget.lastTimeAction ?? DateTime(2019),
+        lastDate: today);
     _pickDate(picked, LastActionDates.date);
   }
 
