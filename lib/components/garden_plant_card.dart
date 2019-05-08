@@ -19,8 +19,8 @@ class GardenPlantCard extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 5.0),
         decoration: _declareGardenPlantCardDecoration(),
         child: Column(children: <Widget>[
-          Row(children: <Widget>[PlantListImage(plant.image), _buildPlantInfo()]),
-          PlantNameBox(plant.name)
+          Row(children: <Widget>[PlantListImage(plant.image, 120, 120), _buildPlantInfo()]),
+          PlantNameBox(plant.name, 16)
         ]));
   }
 
@@ -36,13 +36,16 @@ class GardenPlantCard extends StatelessWidget {
 
   Widget _buildPlantInfo() {
     return Expanded(
-      child: SingleChildScrollView(
+      child: Container(
         padding: EdgeInsets.only(right: 10.0),
-        scrollDirection: Axis.horizontal,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: reminders.map((reminder) => _buildReminderInfo(reminder)).toList()),
+        child: SingleChildScrollView(
+
+          scrollDirection: Axis.horizontal,
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: reminders.map((reminder) => _buildReminderInfo(reminder)).toList()),
+        ),
       ),
     );
   }
@@ -57,27 +60,29 @@ class GardenPlantCard extends StatelessWidget {
     children.add(_buildIconInfo('Tiempo desde la última vez', Icons.access_time));
     children
         .add(_buildTextInfo('Tiempo desde la última vez', reminder.daysWithoutAction.toString()));
+    children.add(SizedBox(width: 20.0));
+    children.add(_buildIconInfo('Frecuencia', Icons.autorenew));
+    children.add(_buildTextInfo('Frecuencia', reminder.frequencyDays.toString()));
     if (reminder.postponedDays > 0) {
       children.add(_buildIconInfo('Días pospuestos', Icons.add));
       children.add(_buildTextInfo('Días pospuestos', reminder.postponedDays.toString()));
     }
-    children.add(SizedBox(width: 20.0));
-    children.add(_buildIconInfo('Frecuencia', Icons.autorenew));
-    children.add(_buildTextInfo('Frecuencia', reminder.frequencyDays.toString()));
-    children.add(SizedBox(width: 20.0));
     return children;
   }
 
   Widget _buildIconInfo(String tooltipMessage, IconData iconData) {
     return Tooltip(
-        message: tooltipMessage, preferBelow: false, child: Icon(iconData, size:16,color: Colors.black54));
+        message: tooltipMessage,
+        preferBelow: false,
+        child: Icon(iconData, size: 16, color: Colors.black54));
   }
 
   Widget _buildTextInfo(String tooltipMessage, String infoText) {
     return Tooltip(
         message: tooltipMessage,
         preferBelow: false,
-        child: Text('$infoText d', style: TextStyle(color: Colors.black54)));
+        child: Text('$infoText ${infoText == '1' ? 'día' : 'días'}',
+            style: TextStyle(color: Colors.black54)));
   }
 
   Widget _buildReminderIcon(ReminderType reminderType) {

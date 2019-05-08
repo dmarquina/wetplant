@@ -44,7 +44,7 @@ class _LastActionDateState extends State<LastActionDate> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 FlatButton(
-                    onPressed: () => _pickDate(yesterday, LastActionDates.yesterday),
+                    onPressed: () => _buildYesterdayAction(),
                     color:
                         lastDateSelected == LastActionDates.yesterday ? widget.color : GreyInactive,
                     shape: RoundedRectangleBorder(
@@ -71,11 +71,20 @@ class _LastActionDateState extends State<LastActionDate> {
         ]));
   }
 
+  Function _buildYesterdayAction() {
+    if (widget.lastTimeAction != null) {
+      return checkDatesAreEquals(widget.lastTimeAction, yesterday)
+          ? null
+          : _pickDate(yesterday, LastActionDates.yesterday);
+    }
+    return _pickDate(yesterday, LastActionDates.yesterday);
+  }
+
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: today,
-        firstDate: widget.lastTimeAction ?? DateTime(2019),
+        firstDate: widget.lastTimeAction?.add(Duration(days: 1)) ?? DateTime(2018),
         lastDate: today);
     _pickDate(picked, LastActionDates.date);
   }

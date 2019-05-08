@@ -40,33 +40,31 @@ class _ActionModalState extends State<ActionModal> {
       Container(
           alignment: Alignment.center,
           margin: EdgeInsets.symmetric(vertical: 10.0),
-          child: Text(widget.plant.name, style: TextStyle(color: Colors.black54, fontSize: 16))),
+          child: Text(widget.plant.name.toUpperCase(),
+              style: TextStyle(color: Colors.black54, fontSize: 16))),
       Divider(),
-      SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            LastActionDate(
-              availableReminder.accentColor,
-              datePicked,
-              (date) {
-                _setDatePicked(date);
-              },
-              lastTimeAction: widget.reminder.lastDateAction,
-            )
-          ])),
+      Center(
+          child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                LastActionDate(availableReminder.accentColor, datePicked, (date) {
+                  _setDatePicked(date);
+                }, lastTimeAction: widget.reminder.lastDateAction)
+              ]))),
       FrequencyDays(
-        type: 'Posponer',
-        initialValue: daysToPostpone,
-        color: YellowSecond,
-        onChange: (value) {
-          _setDaysToPostpone(value);
-        },
-      ),
-      SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            ButtonBar(children: <Widget>[_buildPostponeButton(), _buildActionButton()])
-          ]))
+          type: 'Posponer',
+          initialValue: daysToPostpone,
+          color: YellowSecond,
+          onChange: (value) {
+            _setDaysToPostpone(value);
+          }),
+      Center(
+        child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              ButtonBar(children: <Widget>[_buildPostponeButton(), _buildActionButton()])
+            ])),
+      )
     ]);
   }
 
@@ -78,10 +76,8 @@ class _ActionModalState extends State<ActionModal> {
         width: 120,
         buttonRadius: BorderRadius.all(Radius.circular(8)),
         onPressed: () => widget.onSubmitAction(datePicked),
-        child: Text(
-          rType == ReminderType.Water ? 'REGAR' : 'FERTILIZAR',
-          style: TextStyle(fontSize: 16, color: Colors.white),
-        ));
+        child: Text(rType == ReminderType.Water ? 'REGAR' : 'FERTILIZAR',
+            style: TextStyle(fontSize: 16, color: Colors.white)));
   }
 
   Widget _buildPostponeButton() {
@@ -92,19 +88,11 @@ class _ActionModalState extends State<ActionModal> {
         width: 120,
         buttonRadius: BorderRadius.all(Radius.circular(8)),
         onPressed: () => widget.onPostpone(daysToPostpone),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'POSPONER',
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
-            Text(
-              '+ ${daysToPostpone.toString()} ${daysToPostpone == 1 ? 'día' : 'días'}',
-              style: TextStyle(fontSize: 10, color: Colors.white),
-            ),
-          ],
-        ));
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          Text('POSPONER', style: TextStyle(fontSize: 12, color: Colors.white)),
+          Text('+ ${daysToPostpone.toString()} ${daysToPostpone == 1 ? 'día' : 'días'}',
+              style: TextStyle(fontSize: 10, color: Colors.white))
+        ]));
   }
 
   _setDaysToPostpone(int daysToPostpone) {
@@ -118,33 +106,25 @@ class _ActionModalState extends State<ActionModal> {
   }
 
   Widget _buildAvatarPlantImage() {
-    return Stack(
-      children: <Widget>[
-        Center(
+    return Stack(children: <Widget>[
+      Center(
           child: Container(
-            margin: EdgeInsets.fromLTRB(0, 16, 0, 8),
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage(widget.plant.image),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
+              margin: EdgeInsets.fromLTRB(0, 16, 0, 8),
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                      image: NetworkImage(widget.plant.image), fit: BoxFit.cover)))),
+      Positioned(
           right: 8,
           top: 8,
           child: IconButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              icon: Icon(Icons.close, size: 28, color: Colors.grey)),
-        ),
-      ],
-    );
+              icon: Icon(Icons.close, size: 28, color: Colors.grey)))
+    ]);
   }
 
   _initValues() {

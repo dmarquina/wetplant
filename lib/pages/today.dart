@@ -37,7 +37,16 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Widget _buildTodayPlants(MainModel model) {
-    return Column(
-        children: model.todayPlants.map((gp) => TodayPlantCard(gp.plant, gp.reminders)).toList());
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.0),
+      child: GridView.count(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          shrinkWrap: true,
+          primary: false,
+          crossAxisSpacing: 25.0,
+          mainAxisSpacing: 10.0,
+          crossAxisCount: 2,
+          children: model.todayPlants.map((gp) => TodayPlantCard(gp.plant, gp.reminders)).toList()),
+    );
   }
 }

@@ -85,15 +85,17 @@ class _ReminderCardState extends State<ReminderCard> {
                       margin: EdgeInsets.symmetric(vertical: 10.0),
                       child: Text('¿Cuándo fue la última vez?',
                           style: TextStyle(color: Colors.black54, fontSize: 16))),
-                  SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                        LastActionDate(
-                            widget.availableReminder.accentColor, datePicked ?? DateTime.now(),
-                            (date) {
-                          datePicked = date;
-                        })
-                      ])),
+                  Center(
+                    child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                          LastActionDate(
+                              widget.availableReminder.accentColor, datePicked ?? DateTime.now(),
+                              (date) {
+                            datePicked = date;
+                          })
+                        ])),
+                  ),
                   FrequencyDays(
                       onChange: (int frequency) {
                         frequencyDays = frequency;
@@ -101,21 +103,24 @@ class _ReminderCardState extends State<ReminderCard> {
                       initialValue: frequencyDays,
                       type: "${widget.availableReminder.title} cada",
                       color: widget.availableReminder.accentColor),
-                  SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                        ButtonBar(children: <Widget>[
-                          FlatButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(8))),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('CANCELAR'),
-                          ),
-                          _buildAddButton()
-                        ])
-                      ]))
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                          ButtonBar(children: <Widget>[
+                            FlatButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(8))),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('CANCELAR'),
+                            ),
+                            _buildAddButton()
+                          ])
+                        ])),
+                  )
                 ]));
   }
 

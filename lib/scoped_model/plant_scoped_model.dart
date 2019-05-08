@@ -5,10 +5,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:wetplant/constants/constant_variables.dart';
 import 'package:wetplant/model/garden_plant.dart';
 import 'package:wetplant/model/plant.dart';
 import 'package:wetplant/model/reminder.dart';
-import 'package:wetplant/util/date_util.dart';
 
 mixin PlantScopedModel on Model {
   List<GardenPlant> gardenPlants = new List();
@@ -28,7 +28,7 @@ mixin PlantScopedModel on Model {
   }
 
   Future<List> getPlants(String userId) async {
-    var res = await http.get("http://192.168.1.40:8080/plants/users/$userId");
+    var res = await http.get("$HOST:8080/plants/users/$userId");
     List<dynamic> decodeJson = jsonDecode(res.body);
     gardenPlants = decodeJson.map((json) => GardenPlant.fromJson(json)).toList();
     todayPlants = _getTodayPlant(gardenPlants);
@@ -36,28 +36,27 @@ mixin PlantScopedModel on Model {
   }
 
   Future<Plant> getPlantById(int plantId) async {
-    var res = await http.get('http://192.168.1.40:8080/plants/$plantId');
+    var res = await http.get('$HOST:8080/plants/$plantId');
     dynamic plant = jsonDecode(res.body);
-
     Plant plantDetail = new Plant.fromJson(plant);
     return plantDetail;
   }
 
   addNewPlant(Map<String, dynamic> jsonPlant, File imageFile) async {
-    http.Response res = await http.post("http://192.168.1.40:8080/plants/",
+    http.Response res = await http.post("$HOST:8080/plants/",
         body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
     await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
   }
 
   updateLastDateAction(int reminderId, String lastDateAction) async {
-    await http.patch('http://192.168.1.40:8080/reminders/$reminderId/lastdateaction',
+    await http.patch('$HOST:8080/reminders/$reminderId/lastdateaction',
         body: jsonEncode({'lastDateAction': lastDateAction}),
         headers: {'Content-Type': 'application/json'});
     notifyListeners();
   }
 
   updatePostponedDays(int reminderId, int postponedDays) async {
-    await http.patch('http://192.168.1.40:8080/reminders/$reminderId/postponeddays',
+    await http.patch('$HOST:8080/reminders/$reminderId/postponeddays',
         body: jsonEncode({'postponedDays': postponedDays}),
         headers: {'Content-Type': 'application/json'});
     notifyListeners();
@@ -83,7 +82,7 @@ mixin PlantScopedModel on Model {
 //      'name': _nameTextController.text,
 //      'image': _imagePlant
 //    };
-//    http.Response res = await http.put("http://192.168.1.40:8080/plant/",
+//    http.Response res = await http.put("$HOST:8080/plant/",
 //        body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
 //    if (imageFile != null) {
 //      await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
@@ -91,7 +90,7 @@ mixin PlantScopedModel on Model {
 //  }
 //
   Future<http.StreamedResponse> _addImage(String id, File image) {
-    var url = Uri.parse("http://192.168.1.40:8080/plants/image");
+    var url = Uri.parse("$HOST:8080/plants/image");
     var request = new http.MultipartRequest("POST", url);
     request.headers['content-type'] = 'multipart/form-data';
     request.fields['id'] = id;

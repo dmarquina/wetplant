@@ -3,8 +3,8 @@ import 'package:wetplant/constants/colors';
 
 class PlantNameBox extends StatelessWidget {
   final String plantName;
-
-  PlantNameBox(this.plantName);
+  final double fontSize;
+  PlantNameBox(this.plantName,this.fontSize);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class PlantNameBox extends StatelessWidget {
     Color _kAmbientShadowOpacity = timeBasedColor.withAlpha(31);
     return Container(
         height: 40,
-        alignment: Alignment(-1.0, 0.0),
+        alignment: Alignment.centerLeft,
         padding: EdgeInsets.only(left: 10),
         decoration: BoxDecoration(
           gradient: GreenGradient,
@@ -37,6 +37,6 @@ class PlantNameBox extends StatelessWidget {
                 color: _kAmbientShadowOpacity)
           ],
         ),
-        child: Text(plantName.toUpperCase(), style: TextStyle(fontSize: 16, color: Colors.white)));
+        child: Text(plantName.toUpperCase(), style: TextStyle(fontSize: fontSize, color: Colors.white)));
   }
 }
