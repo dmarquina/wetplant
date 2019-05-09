@@ -12,67 +12,47 @@ class NoFlowersToWater extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              _getIcon(),
-              color: _getColor(),
-              size: 70,
-            ),
-            Container(
-                padding: EdgeInsets.only(top: 28),
-                child: Text(
-                  _getText(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Color.fromRGBO(0, 0, 0, 0.3)),
-                )),
-            _buildArrowToNewPlant()
-          ],
-        ));
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          Icon(
+            _getIcon(),
+            color: _getColor(),
+            size: 70,
+          ),
+          Container(
+              padding: EdgeInsets.only(top: 28),
+              child: Text(
+                _getText(),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Color.fromRGBO(0, 0, 0, 0.3)),
+              )),
+          SizedBox(height: 35.0),
+          hasNoFlowers ? _buildArrowToNewPlant() : Container()
+        ]));
   }
 
   IconData _getIcon() {
-    if (hasCompleted) {
-      return CustomIcons.emo_thumbsup;
-    }
-
     if (hasNoFlowers) {
       return CustomIcons.emo_squint;
     }
-
-    return CustomIcons.emo_grin;
+    return CustomIcons.emo_sunglasses;
   }
 
   String _getText() {
-    if (hasCompleted) {
-      return 'Todas tus plantas han sido atendidas';
-    }
-
     if (hasNoFlowers) {
       return 'Agrega una planta\npara iniciar tu nueva aventura';
     }
-
-    return 'Ninguna planta necesita atención hoy';
+    return 'Todas tus plantas han sido atendidas';
   }
 
   Color _getColor() {
-    if (hasCompleted) {
-      return BlueMain;
-    }
-
     if (hasNoFlowers) {
       return YellowMain;
     }
 
-    return GreenMain;
+    return BlueMain;
   }
 
   Widget _buildArrowToNewPlant() {
-    return hasNoFlowers && !hasCompleted
-        ? Container(
-            padding: EdgeInsets.only(top: 20),
-            child: Icon(Icons.arrow_downward, color: YellowMain, size: 70))
-        : Container();
+    return Icon(Icons.arrow_downward, size: 50.0, color: Color.fromRGBO(0, 0, 0, 0.3));
   }
 }

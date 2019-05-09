@@ -24,49 +24,45 @@ class _GardenPageState extends State<GardenPage> {
   Widget _buildTitleAndPlantList(List<GardenPlant> gardenPlantList) {
     var children = <Widget>[];
     children.add(PageTitle(title: 'Jardín'));
-    children.add(DefaultTabController(
-      length: 3,
-      child: TabBar(
-        labelColor: GreenMain,
-        tabs: [
-          Tab(icon: Icon(Icons.view_list)),
-          Tab(icon: Icon(Icons.grid_on)),
-        ],
-      ),
-    ));
-    children.add(SizedBox(height: 10.0));
-    if (gardenPlantList != null && gardenPlantList.length > 0) {
+    if (gardenPlantList != null && gardenPlantList.isNotEmpty) {
+      children.add(DefaultTabController(
+        length: 3,
+        child: TabBar(
+          labelColor: GreenMain,
+          tabs: [
+            Tab(icon: Icon(Icons.view_list)),
+            Tab(icon: Icon(Icons.grid_on)),
+          ],
+        ),
+      ));
+      children.add(SizedBox(height: 10.0));
       children.addAll(_buildPlantList(gardenPlantList));
     } else {
-      children.add(_buildNoPlants());
+      children.add(_buildNoPlantsText());
     }
     return ListView(padding: EdgeInsets.symmetric(horizontal: 10), children: children);
   }
 
   List<Widget> _buildPlantList(List<GardenPlant> gardenPlantList) {
     return gardenPlantList.map((gp) {
-
-      return GardenPlantCard(gp.plant,gp.reminders);
+      return GardenPlantCard(gp.plant, gp.reminders);
     }).toList();
   }
 
-  Widget _buildNoPlants() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Text('Aún no tienes ninguna planta guardada', style: TextStyle(color: Colors.white)),
-          SizedBox(height: 10.0),
-          Text('Agrega una', style: TextStyle(color: Colors.white)),
-          SizedBox(height: 30.0),
-          Icon(
-            Icons.arrow_downward,
-            size: 50.0,
-            color: Colors.white,
-          ),
-        ],
-      ),
-    );
+  Widget _buildNoPlantsText() {
+    return Container(
+        margin: EdgeInsets.only(top: 150.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text('Aún no tienes ninguna planta guardada',
+                style: TextStyle(color: Color.fromRGBO(0, 0, 0, 0.3))),
+            SizedBox(height: 10.0),
+            Text('¡Agrega una!', style: TextStyle(color: Color.fromRGBO(0, 0, 0, 0.3))),
+            SizedBox(height: 30.0),
+            Icon(Icons.arrow_downward, size: 50.0, color: Color.fromRGBO(0, 0, 0, 0.3))
+          ],
+        ));
   }
 }

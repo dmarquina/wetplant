@@ -29,7 +29,7 @@ class _TodayPageState extends State<TodayPage> {
     if (model.todayPlants.isEmpty) {
       children.add(Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: NoFlowersToWater(hasNoFlowers: true, hasCompleted: true)));
+          child: NoFlowersToWater(hasNoFlowers: model.gardenPlants.isEmpty)));
     } else {
       children.add(_buildTodayPlants(model));
     }
@@ -37,14 +37,21 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Widget _buildTodayPlants(MainModel model) {
+    var size = MediaQuery.of(context).size;
+
+    /*24 is for notification bar on Android*/
+    final double itemHeight = (size.height + 425);
+    final double itemWidth = (size.width * 2) - 50;
+    var childAspectRadioValue = itemWidth / itemHeight;
     return Container(
       margin: EdgeInsets.only(bottom: 10.0),
       child: GridView.count(
           padding: EdgeInsets.symmetric(horizontal: 15),
           shrinkWrap: true,
           primary: false,
-          crossAxisSpacing: 25.0,
-          mainAxisSpacing: 10.0,
+          childAspectRatio: childAspectRadioValue,
+          mainAxisSpacing: 5.0,
+          crossAxisSpacing: 20.0,
           crossAxisCount: 2,
           children: model.todayPlants.map((gp) => TodayPlantCard(gp.plant, gp.reminders)).toList()),
     );

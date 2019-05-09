@@ -97,7 +97,7 @@ class EditPlantPageState extends State<EditPlantPage> {
     return TextFormField(
       controller: _nameTextController,
       decoration: InputDecoration(helperText: 'Nombre'),
-      maxLength: 35,
+      maxLength: 32,
       validator: (String value) {
         if (value.isEmpty || value.length < 0) return 'Tu planta debe tener un nombre';
       },

@@ -32,7 +32,7 @@ class TodayPlantCard extends StatelessWidget {
 
   Widget _buildPlantImageRemindersStack() {
     return Stack(children: <Widget>[
-      PlantListImage(plant.image, 110, 170),
+      PlantListImage(plant.image, 170, 180),
       Positioned(left: 8, top: 8, child: _getReminderIcon())
     ]);
   }
