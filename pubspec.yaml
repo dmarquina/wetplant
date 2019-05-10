@@ -20,6 +20,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   scoped_model: ^1.0.1
   cached_network_image: ^0.8.0
+  carousel_slider: ^1.0.1
 
 dev_dependencies:
   flutter_test:

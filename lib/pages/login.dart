@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
                 CircularProgressIndicator(),
                 SizedBox(
-                  height: 10.0,
+                  height: 10.0
                 ),
                 Text('Iniciando sesión')
               ]))
@@ -53,13 +53,6 @@ class _LoginPageState extends State<LoginPage> {
                             child: SingleChildScrollView(
                                 padding: EdgeInsets.all(20.0),
                                 child: Column(children: <Widget>[
-//                                Text('Bienvenid@',
-//                                    style: TextStyle(
-//                                        fontWeight: FontWeight.w600,
-//                                        fontSize: 24.0,
-//                                        color: Colors.green)),
-//                                SizedBox(height: 10.0),
-//                                Divider(),
                                   TextFormField(
                                       controller: _emailController,
                                       decoration:
@@ -182,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
         final Map<String, dynamic> responseData = json.decode(res.body);
         Map<String, dynamic> successInformation = _checkAuthenticate(responseData,model);
         if (successInformation['success']) {
-          _goToPlantsManagerPage();
+          _goToPlantsManagerPage(model);
         } else {
           showDialog(
               context: context,
@@ -226,6 +219,6 @@ class _LoginPageState extends State<LoginPage> {
     return {'success': !hasError, 'message': message};
   }
 
-  _goToPlantsManagerPage() => Navigator.pushReplacement(context,
-      MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage()));
+  _goToPlantsManagerPage(Model model) => Navigator.pushReplacement(context,
+      MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage(model)));
 }

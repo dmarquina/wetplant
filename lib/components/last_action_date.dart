@@ -114,9 +114,5 @@ class _LastActionDateState extends State<LastActionDate> {
     }
   }
 
-  String formatDate(DateTime date) {
-    String day = date.day < 10 ? '0' + date.day.toString() : date.day.toString();
-    String month = date.month < 10 ? '0' + date.month.toString() : date.month.toString();
-    return '$day/$month';
-  }
+
 }

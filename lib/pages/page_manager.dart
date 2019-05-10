@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/components/custom_scroll_color.dart';
 import 'package:wetplant/components/fab_bottom_app_bar.dart';
 import 'package:wetplant/constants/colors';
@@ -9,6 +8,10 @@ import 'package:wetplant/pages/today.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 
 class PageManagerPage extends StatefulWidget {
+  final MainModel model;
+
+  PageManagerPage(this.model);
+
   @override
   _PageManagerPageState createState() => _PageManagerPageState();
 }
@@ -18,23 +21,21 @@ class _PageManagerPageState extends State<PageManagerPage> {
   final _widgetOptions = [TodayPage(), GardenPage()];
 
   @override
+  void initState() {
+    widget.model.getPlants(widget.model.ownerId);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-          child: SafeArea(child: ScopedModelDescendant<MainModel>(
-              builder: (BuildContext context, Widget child, MainModel model) {
-            return Scaffold(
-              body: CustomScrollColor(
-                child: FutureBuilder(
-                    future: model.getPlants(model.ownerId),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      return snapshot.connectionState == ConnectionState.done
-                          ? _widgetOptions.elementAt(_selectedIndex)
-                          : Center(child: CircularProgressIndicator());
-                    }),
-              ),
-            );
-          })),
+          child: SafeArea(
+              child: Scaffold(
+            body: CustomScrollColor(
+              child: _widgetOptions.elementAt(_selectedIndex),
+            ),
+          )),
         ),
         floatingActionButton: FloatingActionButton(
             backgroundColor: GreenMain,

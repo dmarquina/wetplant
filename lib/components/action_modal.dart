@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:wetplant/components/frequency_days.dart';
 import 'package:wetplant/components/gradient_material_button.dart';
@@ -115,7 +116,7 @@ class _ActionModalState extends State<ActionModal> {
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                      image: NetworkImage(widget.plant.image), fit: BoxFit.cover)))),
+                      image: CachedNetworkImageProvider(widget.plant.image??''), fit: BoxFit.cover)))),
       Positioned(
           right: 8,
           top: 8,

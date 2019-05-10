@@ -13,6 +13,7 @@ import 'package:wetplant/model/reminder.dart';
 mixin PlantScopedModel on Model {
   List<GardenPlant> gardenPlants = new List();
   List<GardenPlant> todayPlants = new List();
+  bool fetchingPlants = false;
 
   List<GardenPlant> _getTodayPlant(List<GardenPlant> gardenPlants) {
     return gardenPlants.where((gp) => checkIfReminderToAttend(gp) != null).toList() ?? [];
@@ -27,12 +28,16 @@ mixin PlantScopedModel on Model {
     return reminder.daysRemainingForAction <= 0;
   }
 
-  Future<List> getPlants(String userId) async {
-    var res = await http.get("$HOST:8080/plants/users/$userId");
-    List<dynamic> decodeJson = jsonDecode(res.body);
-    gardenPlants = decodeJson.map((json) => GardenPlant.fromJson(json)).toList();
-    todayPlants = _getTodayPlant(gardenPlants);
-    return gardenPlants;
+  getPlants(String userId) {
+    fetchingPlants = true;
+    notifyListeners();
+    http.get("$HOST:8080/plants/users/$userId").then((res) {
+      List<dynamic> decodeJson = jsonDecode(res.body);
+      gardenPlants = decodeJson.map((json) => GardenPlant.fromJson(json)).toList();
+      todayPlants = _getTodayPlant(gardenPlants);
+      fetchingPlants = false;
+      notifyListeners();
+    });
   }
 
   Future<Plant> getPlantById(int plantId) async {
@@ -48,17 +53,19 @@ mixin PlantScopedModel on Model {
     await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
   }
 
-  updateLastDateAction(int reminderId, String lastDateAction) async {
+  updateLastDateAction(int reminderId, String lastDateAction,String ownerId) async {
     await http.patch('$HOST:8080/reminders/$reminderId/lastdateaction',
         body: jsonEncode({'lastDateAction': lastDateAction}),
         headers: {'Content-Type': 'application/json'});
+    this.getPlants(ownerId);
     notifyListeners();
   }
 
-  updatePostponedDays(int reminderId, int postponedDays) async {
+  updatePostponedDays(int reminderId, int postponedDays,String ownerId) async {
     await http.patch('$HOST:8080/reminders/$reminderId/postponeddays',
         body: jsonEncode({'postponedDays': postponedDays}),
         headers: {'Content-Type': 'application/json'});
+    this.getPlants(ownerId);
     notifyListeners();
   }
 

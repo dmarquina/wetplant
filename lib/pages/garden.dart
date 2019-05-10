@@ -17,7 +17,11 @@ class _GardenPageState extends State<GardenPage> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return Scaffold(body: CustomScrollColor(child: _buildTitleAndPlantList(model.gardenPlants)));
+      return Scaffold(
+          body: CustomScrollColor(
+              child: !model.fetchingPlants
+                  ? _buildTitleAndPlantList(model.gardenPlants)
+                  : CircularProgressIndicator()));
     });
   }
 
@@ -44,8 +48,8 @@ class _GardenPageState extends State<GardenPage> {
   }
 
   List<Widget> _buildPlantList(List<GardenPlant> gardenPlantList) {
-    return gardenPlantList.map((gp) {
-      return GardenPlantCard(gp.plant, gp.reminders);
+    return gardenPlantList.map((gardenPlant) {
+      return GardenPlantCard(gardenPlant);
     }).toList();
   }
 

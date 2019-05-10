@@ -1,27 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:wetplant/constants/colors';
-import 'package:wetplant/model/plant.dart';
+import 'package:wetplant/model/garden_plant.dart';
 import 'package:wetplant/model/reminder.dart';
+import 'package:wetplant/pages/plant_detail.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
 import 'package:wetplant/util/decoration.dart';
 import 'package:wetplant/util/plant_list_image.dart';
+import 'package:wetplant/util/reminder_info_widgets.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
 class GardenPlantCard extends StatelessWidget {
-  final Plant plant;
-  final List<Reminder> reminders;
+  final GardenPlant gardenPlant;
 
-  GardenPlantCard(this.plant, this.reminders);
+  GardenPlantCard(this.gardenPlant);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.symmetric(vertical: 5.0),
-        decoration: _declareGardenPlantCardDecoration(),
-        child: Column(children: <Widget>[
-          Row(children: <Widget>[PlantListImage(plant.image, 120, 120), _buildPlantInfo()]),
-          PlantNameBox(plant.name, 16)
-        ]));
+    return GestureDetector(
+      onTap: (){Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PlantDetailPage(gardenPlant),
+        ),
+      );},
+      child: Container(
+          margin: EdgeInsets.symmetric(vertical: 5.0),
+          decoration: _declareGardenPlantCardDecoration(),
+          child: Column(children: <Widget>[
+            Row(children: <Widget>[PlantListImage(gardenPlant.plant.image, 120, 120), _buildPlantInfo()]),
+            PlantNameBox(gardenPlant.plant.name, 16)
+          ])),
+    );
   }
 
   BoxDecoration _declareGardenPlantCardDecoration() {
@@ -44,7 +53,7 @@ class GardenPlantCard extends StatelessWidget {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: reminders.map((reminder) => _buildReminderInfo(reminder)).toList()),
+              children: gardenPlant.reminders.map((reminder) => _buildReminderInfo(reminder)).toList()),
         ),
       ),
     );
@@ -56,42 +65,21 @@ class GardenPlantCard extends StatelessWidget {
 
   List<Widget> _buildInfo(Reminder reminder) {
     List<Widget> children = [];
-    children.add(_buildReminderIcon(reminder.reminderType));
-    children.add(_buildIconInfo('Tiempo desde la última vez', Icons.access_time));
+    children.add(buildReminderIcon(reminder.reminderType));
+    children.add(buildIconInfo('Tiempo desde la última vez', Icons.access_time));
     children
-        .add(_buildTextInfo('Tiempo desde la última vez', reminder.daysWithoutAction.toString()));
+        .add(buildTextInfo('Tiempo desde la última vez', reminder.daysWithoutAction.toString()));
     children.add(SizedBox(width: 20.0));
-    children.add(_buildIconInfo('Frecuencia', Icons.autorenew));
-    children.add(_buildTextInfo('Frecuencia', reminder.frequencyDays.toString()));
+    children.add(buildIconInfo('Frecuencia', Icons.autorenew));
+    children.add(buildTextInfo('Frecuencia', reminder.frequencyDays.toString()));
     if (reminder.postponedDays > 0) {
-      children.add(_buildIconInfo('Días pospuestos', Icons.add));
-      children.add(_buildTextInfo('Días pospuestos', reminder.postponedDays.toString()));
+      children.add(buildIconInfo('Días pospuestos', Icons.add));
+      children.add(buildTextInfo('Días pospuestos', reminder.postponedDays.toString()));
     }
     return children;
   }
 
-  Widget _buildIconInfo(String tooltipMessage, IconData iconData) {
-    return Tooltip(
-        message: tooltipMessage,
-        preferBelow: false,
-        child: Icon(iconData, size: 16, color: Colors.black54));
-  }
 
-  Widget _buildTextInfo(String tooltipMessage, String infoText) {
-    return Tooltip(
-        message: tooltipMessage,
-        preferBelow: false,
-        child: Text('$infoText ${infoText == '1' ? 'día' : 'días'}',
-            style: TextStyle(color: Colors.black54)));
-  }
 
-  Widget _buildReminderIcon(ReminderType reminderType) {
-    if (reminderType == ReminderType.Water) {
-      return Icon(CustomIcons.water_amount_small, color: ReminderBlueMain, size: 45);
-    } else {
-      return Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-          child: Icon(Icons.flash_on, color: BrownMain, size: 25));
-    }
-  }
+
 }

@@ -10,6 +10,7 @@ import 'package:wetplant/constants/available-reminders.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/plant.dart';
 import 'package:wetplant/model/reminder.dart';
+import 'package:wetplant/pages/page_manager.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
@@ -30,7 +31,6 @@ class EditPlantPageState extends State<EditPlantPage> {
 
   final _nameTextController = TextEditingController(text: '');
   File _imageFile;
-  String _imagePlant = '';
   String _appBarTitle = 'NUEVA PLANTA';
   String _waitingMessage = 'Publicando tu nueva plantita';
   bool _waitingAction = false;
@@ -172,7 +172,8 @@ class EditPlantPageState extends State<EditPlantPage> {
       'reminders': _getJsonReminders(_reminders)
     };
     await model.addNewPlant(jsonNewPlant, _imageFile);
-    Navigator.pop(context);
+    Navigator.pushReplacement(context,
+        MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage(model)));
   }
 
   List<Map<String,dynamic>> _getJsonReminders(Map reminders) {

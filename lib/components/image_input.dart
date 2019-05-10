@@ -140,7 +140,6 @@ class ImageInputState extends State<ImageInput> {
   }
 
   _checkFileCorrectSize(FormFieldState<dynamic> imageForm, File image) {
-    print(image.lengthSync());
     if (image.lengthSync() <= 1000000) {
       widget.onSave(image);
       imageForm.setValue(image);

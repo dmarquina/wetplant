@@ -79,12 +79,12 @@ class TodayPlantCard extends StatelessWidget {
   }
 
   _postponedAction(Reminder reminder, int daysToPostponed) {
-    _model.updatePostponedDays(reminder.id, daysToPostponed);
+    _model.updatePostponedDays(reminder.id, daysToPostponed,_model.ownerId);
     Navigator.pop(_context);
   }
 
   _onSubmitAction(int reminderId, DateTime lastActionDate) {
-    _model.updateLastDateAction(reminderId, lastActionDate.toIso8601String());
+    _model.updateLastDateAction(reminderId, lastActionDate.toIso8601String(),_model.ownerId);
     Navigator.pop(_context);
   }
 }
