@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/components/frequency_days.dart';
 import 'package:wetplant/components/gradient_material_button.dart';
 import 'package:wetplant/components/last_action_date.dart';
 import 'package:wetplant/constants/available-reminders.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/reminder.dart';
+import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
 class ReminderCard extends StatefulWidget {
   final AvailableReminder availableReminder;
   final Function addReminder;
   final Function deleteReminder;
+  Reminder reminder;
+  int countRemindersInMemory;
 
-  ReminderCard(this.availableReminder, this.addReminder, this.deleteReminder);
+  ReminderCard(this.availableReminder, this.addReminder, this.deleteReminder,
+      {this.reminder, this.countRemindersInMemory});
 
   @override
   _ReminderCardState createState() => _ReminderCardState();
 }
 
 class _ReminderCardState extends State<ReminderCard> {
-  DateTime datePicked;
-  int frequencyDays = 0;
-  Map<ReminderType, bool> _remindersSelected = Map();
+  DateTime _datePicked;
+  int _frequencyDays = 0;
+  bool _editing = false;
+  bool _reminderSelected = false;
 
   @override
   void initState() {
@@ -33,45 +39,41 @@ class _ReminderCardState extends State<ReminderCard> {
   Widget build(BuildContext context) {
     ReminderType rType = widget.availableReminder.reminderType;
     return GestureDetector(
-      onLongPress: () => _openDeleteReminderDialog(context),
-      child: Container(
-        width: 180,
-        margin: EdgeInsets.fromLTRB(0, 0, 0, 8),
-        decoration: _buildCardBoxDecoration(),
-        child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                onTap: () {
-                  _openDialog(context);
-                },
-                child: Stack(children: <Widget>[
-                  Container(
-                      alignment: Alignment(0, 0),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(widget.availableReminder.title.toUpperCase(),
-                                style: TextStyle(fontSize: 20, color: Colors.black)),
-                            Container(
-                                padding: ReminderType.Water != rType
-                                    ? EdgeInsets.symmetric(vertical: 10.0)
-                                    : EdgeInsets.only(),
-                                child: Icon(widget.availableReminder.iconData,
-                                    color: _remindersSelected[rType] != null &&
-                                            _remindersSelected[rType]
-                                        ? widget.availableReminder.primaryColor
-                                        : GreyInactive,
-                                    size: widget.availableReminder.size)),
-//                          _buildReminderInfo()
-                          ]))
-                ]))),
-      ),
-    );
+        onLongPress: () => _openDeleteReminderDialog(context),
+        child: Container(
+            width: 180,
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 8),
+            decoration: _buildCardBoxDecoration(),
+            child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    onTap: () {
+                      _openReminderDialog(context);
+                    },
+                    child: Stack(children: <Widget>[
+                      Container(
+                          alignment: Alignment(0, 0),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(widget.availableReminder.title.toUpperCase(),
+                                    style: TextStyle(fontSize: 20, color: Colors.black)),
+                                Container(
+                                    padding: ReminderType.Water != rType
+                                        ? EdgeInsets.symmetric(vertical: 10.0)
+                                        : EdgeInsets.only(),
+                                    child: Icon(widget.availableReminder.iconData,
+                                        color: _reminderSelected
+                                            ? widget.availableReminder.primaryColor
+                                            : GreyInactive,
+                                        size: widget.availableReminder.size))
+                              ]))
+                    ])))));
   }
 
-  _openDialog(BuildContext context) {
+  _openReminderDialog(BuildContext context) {
     showDialog(
         context: context,
         builder: (_) => SimpleDialog(
@@ -90,17 +92,17 @@ class _ReminderCardState extends State<ReminderCard> {
                         scrollDirection: Axis.horizontal,
                         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
                           LastActionDate(
-                              widget.availableReminder.accentColor, datePicked ?? DateTime.now(),
+                              widget.availableReminder.accentColor, _datePicked ?? DateTime.now(),
                               (date) {
-                            datePicked = date;
+                            _datePicked = date;
                           })
                         ])),
                   ),
                   FrequencyDays(
                       onChange: (int frequency) {
-                        frequencyDays = frequency;
+                        _frequencyDays = frequency;
                       },
-                      initialValue: frequencyDays,
+                      initialValue: _frequencyDays,
                       type: "${widget.availableReminder.title} cada",
                       color: widget.availableReminder.accentColor),
                   Container(
@@ -124,40 +126,6 @@ class _ReminderCardState extends State<ReminderCard> {
                 ]));
   }
 
-  _openDeleteReminderDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (_) => SimpleDialog(
-                contentPadding: EdgeInsets.all(0),
-                title: Text(
-                    'Eliminar recordatorio de ${widget.availableReminder.title.toLowerCase()}',
-                    style: TextStyle(fontSize: 16.0)),
-                children: <Widget>[
-                  ButtonBar(
-                    children: <Widget>[
-                      FlatButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('CANCELAR'),
-                      ),
-                      FlatButton(
-                        color: RedMain,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        onPressed: () {
-                          _deleteReminder();
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('SI', style: TextStyle(color: Colors.white)),
-                      )
-                    ],
-                  )
-                ]));
-  }
-
   Widget _buildAddButton() {
     return GradientButton(
         shadow: true,
@@ -165,45 +133,120 @@ class _ReminderCardState extends State<ReminderCard> {
         height: 40,
         width: 120,
         buttonRadius: BorderRadius.all(Radius.circular(8)),
-        onPressed: _addReminder,
+        onPressed: _addOrUpdateReminder,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'AGREGAR',
+              _editing ? 'EDITAR' : 'AGREGAR',
               style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ],
         ));
   }
 
-  _addReminder() {
+  _openDeleteReminderDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) => SimpleDialog(
+                contentPadding: EdgeInsets.all(0),
+                title: Text(
+                    '¿Deseas eliminar el recordatorio de ${widget.availableReminder.title.toUpperCase()}?',
+                    style: TextStyle(fontSize: 16.0)),
+                children: <Widget>[
+                  ButtonBar(children: <Widget>[
+                    FlatButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('CANCELAR')),
+                    FlatButton(
+                        color: RedMain,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _deleteReminder();
+                        },
+                        child: Text('SI, ELIMINAR', style: TextStyle(color: Colors.white)))
+                  ])
+                ]));
+  }
+
+  _addOrUpdateReminder() {
     Reminder newReminder = Reminder(
+        id: widget?.reminder?.id,
+        postponedDays: widget?.reminder?.postponedDays,
         reminderType: widget.availableReminder.reminderType,
-        lastDateAction: datePicked,
-        frequencyDays: frequencyDays);
+        lastDateAction: _datePicked,
+        frequencyDays: _frequencyDays);
     widget.addReminder(newReminder);
     setState(() {
-      _remindersSelected[widget.availableReminder.reminderType] = true;
+      _reminderSelected = true;
     });
     Navigator.pop(context);
   }
 
   _deleteReminder() {
-    Reminder reminderToDelete = Reminder(
-        reminderType: widget.availableReminder.reminderType,
-        lastDateAction: datePicked,
-        frequencyDays: frequencyDays);
+    if (widget.countRemindersInMemory == 1) {
+      _openDialogOneReminderAtLeast();
+    }else{
+
+    Reminder reminderToDelete;
+    var idReminder = widget?.reminder?.id;
+    if (idReminder != null) {
+      reminderToDelete =
+          Reminder(id: idReminder, reminderType: widget.availableReminder.reminderType);
+      widget.reminder = null;
+    } else {
+      reminderToDelete = Reminder(reminderType: widget.availableReminder.reminderType);
+    }
     widget.deleteReminder(reminderToDelete);
     setState(() {
       _initValues();
-      _remindersSelected[widget.availableReminder.reminderType] = false;
+      _reminderSelected = false;
     });
+    }
   }
 
   _initValues() {
-    datePicked = DateTime.now();
-    frequencyDays = widget.availableReminder.defaultFrequencyValue;
+    _editing = widget.reminder != null;
+    if (_editing) {
+      _datePicked = widget.reminder.lastDateAction;
+      _frequencyDays = widget.reminder.frequencyDays;
+      _reminderSelected = true;
+    } else {
+      _datePicked = DateTime.now();
+      _frequencyDays = widget.availableReminder.defaultFrequencyValue;
+    }
+  }
+
+
+  _openDialogOneReminderAtLeast() {
+    showDialog(
+        context: context,
+        builder: (_) => SimpleDialog(
+            contentPadding: EdgeInsets.all(0),
+            title: Text('ESPERA', style: TextStyle(fontSize: 18.0)),
+            children: <Widget>[
+              Container(
+                  padding: EdgeInsets.only(top: 10.0, left: 25.0, right: 25.0),
+                  child: Text('Debes tener al menos un recordatorio activo')),
+              ButtonBar(
+                children: <Widget>[
+                  FlatButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('ENTIENDO'),
+                  ),
+                ],
+              )
+            ]));
   }
 
   BoxDecoration _buildCardBoxDecoration() {

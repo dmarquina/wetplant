@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wetplant/components/custom_scroll_color.dart';
 import 'package:wetplant/components/fab_bottom_app_bar.dart';
 import 'package:wetplant/constants/colors';
-import 'package:wetplant/pages/edit_watered_plant.dart';
+import 'package:wetplant/pages/edit_plant.dart';
 import 'package:wetplant/pages/garden.dart';
 import 'package:wetplant/pages/today.dart';
 import 'package:wetplant/scoped_model/main_model.dart';

@@ -13,6 +13,7 @@ import 'package:wetplant/model/reminder.dart';
 mixin PlantScopedModel on Model {
   List<GardenPlant> gardenPlants = new List();
   List<GardenPlant> todayPlants = new List();
+  List<Reminder> plantDetailReminders = new List();
   bool fetchingPlants = false;
 
   List<GardenPlant> _getTodayPlant(List<GardenPlant> gardenPlants) {
@@ -32,28 +33,35 @@ mixin PlantScopedModel on Model {
     fetchingPlants = true;
     notifyListeners();
     http.get("$HOST:8080/plants/users/$userId").then((res) {
-      List<dynamic> decodeJson = jsonDecode(res.body);
-      gardenPlants = decodeJson.map((json) => GardenPlant.fromJson(json)).toList();
+      List<dynamic> jsonDecoded = jsonDecode(res.body);
+      gardenPlants = jsonDecoded.map((json) => GardenPlant.fromJson(json)).toList();
       todayPlants = _getTodayPlant(gardenPlants);
       fetchingPlants = false;
       notifyListeners();
     });
   }
 
-  Future<Plant> getPlantById(int plantId) async {
+  Future<GardenPlant> getPlantById(int plantId) async {
     var res = await http.get('$HOST:8080/plants/$plantId');
-    dynamic plant = jsonDecode(res.body);
-    Plant plantDetail = new Plant.fromJson(plant);
+    dynamic jsonDecoded = jsonDecode(res.body);
+    GardenPlant plantDetail = new GardenPlant.fromJson(jsonDecoded);
     return plantDetail;
   }
 
-  addNewPlant(Map<String, dynamic> jsonPlant, File imageFile) async {
+  addPlant(Map<String, dynamic> jsonPlant, File imageFile) async {
     http.Response res = await http.post("$HOST:8080/plants/",
         body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
     await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
   }
 
-  updateLastDateAction(int reminderId, String lastDateAction,String ownerId) async {
+  updatePlant(Map<String, dynamic> jsonPlant, File imageFile) async {
+    http.Response res = await http.put("$HOST:8080/plants/",
+        body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
+//    if (imageFile != null) {
+//      await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
+  }
+
+  updateLastDateAction(int reminderId, String lastDateAction, String ownerId) async {
     await http.patch('$HOST:8080/reminders/$reminderId/lastdateaction',
         body: jsonEncode({'lastDateAction': lastDateAction}),
         headers: {'Content-Type': 'application/json'});
@@ -61,7 +69,7 @@ mixin PlantScopedModel on Model {
     notifyListeners();
   }
 
-  updatePostponedDays(int reminderId, int postponedDays,String ownerId) async {
+  updatePostponedDays(int reminderId, int postponedDays, String ownerId) async {
     await http.patch('$HOST:8080/reminders/$reminderId/postponeddays',
         body: jsonEncode({'postponedDays': postponedDays}),
         headers: {'Content-Type': 'application/json'});
@@ -69,33 +77,6 @@ mixin PlantScopedModel on Model {
     notifyListeners();
   }
 
-//
-//  _updateWateredPlant() async {
-//    if (!_formKey.currentState.validate()) {
-//      return;
-//    }
-//    if (_dateTextToSave.isEmpty) {
-//      _validate = true;
-//    }
-//    setState(() {
-//      _waitingAction = true;
-//    });
-//    Map<String, dynamic> jsonPlant = {
-//      'id': widget.plant.id.toString(),
-//      'userId': widget.userId,
-//      'lastDayWatering': _dateTextToSave,
-//      'minWateringDays': _minDaysTextController.text,
-//      'maxWateringDays': _maxDaysTextController.text,
-//      'name': _nameTextController.text,
-//      'image': _imagePlant
-//    };
-//    http.Response res = await http.put("$HOST:8080/plant/",
-//        body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
-//    if (imageFile != null) {
-//      await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
-//    }
-//  }
-//
   Future<http.StreamedResponse> _addImage(String id, File image) {
     var url = Uri.parse("$HOST:8080/plants/image");
     var request = new http.MultipartRequest("POST", url);

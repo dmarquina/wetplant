@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wetplant/constants/colors';
 
 class ImageInput extends StatefulWidget {
   final Function(File) onSave;
+  final String actualImage;
 
-  ImageInput({@required this.onSave});
+  ImageInput({@required this.onSave, this.actualImage});
 
   @override
   State<StatefulWidget> createState() {
@@ -21,7 +23,7 @@ class ImageInputState extends State<ImageInput> {
   ImageSourceType _imageSourceType = ImageSourceType.Camera;
 
   Future<File> _getImageFromCamera() async {
-    var value = await ImagePicker.pickImage(source: ImageSource.camera,maxHeight: 500.0);
+    var value = await ImagePicker.pickImage(source: ImageSource.camera, maxHeight: 500.0);
     setState(() {
       _imageSourceType = ImageSourceType.Camera;
     });
@@ -29,7 +31,7 @@ class ImageInputState extends State<ImageInput> {
   }
 
   Future<File> _getImageFromGallery() async {
-    var value = await ImagePicker.pickImage(source: ImageSource.gallery,maxHeight: 500.0);
+    var value = await ImagePicker.pickImage(source: ImageSource.gallery, maxHeight: 500.0);
     setState(() {
       _imageSourceType = ImageSourceType.Gallery;
     });
@@ -53,6 +55,21 @@ class ImageInputState extends State<ImageInput> {
           borderRadius: BorderRadius.all(Radius.circular(60)),
         ),
         child: icon);
+  }
+
+  Widget _getActualImageContainer(String imageURL) {
+    return Container(
+        height: 70,
+        width: 70,
+        margin: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+        decoration: BoxDecoration(
+          gradient: GreenGradient,
+          image: DecorationImage(
+            image: CachedNetworkImageProvider(imageURL),
+            fit: BoxFit.cover,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(60)),
+        ));
   }
 
   Widget _getCameraContainer(FormFieldState<dynamic> imageForm) {
@@ -89,50 +106,51 @@ class ImageInputState extends State<ImageInput> {
 
   @override
   Widget build(BuildContext context) {
+    bool _editing = widget.actualImage != null;
+
     return FormField(
       onSaved: (File file) {
         widget.onSave(file);
       },
       validator: (value) {
-        return value == null ? 'Selecciona o toma una foto' : null;
+        return value == null && !_editing ? 'Selecciona o toma una foto' : null;
       },
       builder: (imageForm) {
         return Row(
           children: <Widget>[
             Expanded(
-                flex: 1,
-                child: Column(
-                  children: <Widget>[
-                    GestureDetector(
+                flex: _editing ? 2 : 1,
+                child: Column(children: <Widget>[
+                  GestureDetector(
                       onTap: () async {
                         File image = await _getImageFromGallery();
                         _checkFileCorrectSize(imageForm, image);
                       },
-                      child: _getGalleryContainer(imageForm),
-                    ),
-                    Text('Seleccionar', style: TextStyle(color: Colors.black54, fontSize: 12)),
-                  ],
-                )),
+                      child: _getGalleryContainer(imageForm)),
+                  Text('Seleccionar', style: TextStyle(color: Colors.black54, fontSize: 12))
+                ])),
             Expanded(
                 flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () async {
-                            File image = await _getImageFromCamera();
-                            _checkFileCorrectSize(imageForm, image);
-                          },
-                          child: _getCameraContainer(imageForm),
-                        ),
-                        Text('Capturar', style: TextStyle(color: Colors.black54, fontSize: 16)),
-                      ],
-                    ),
-                    _getErrorWidget(imageForm.hasError, imageForm.errorText)
-                  ],
-                ))
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                  Column(children: <Widget>[
+                    GestureDetector(
+                        onTap: () async {
+                          File image = await _getImageFromCamera();
+                          _checkFileCorrectSize(imageForm, image);
+                        },
+                        child: _getCameraContainer(imageForm)),
+                    Text('Capturar', style: TextStyle(color: Colors.black54, fontSize: 16))
+                  ]),
+                  _getErrorWidget(imageForm.hasError, imageForm.errorText)
+                ])),
+            _editing
+                ? Expanded(
+                    flex: 2,
+                    child: Column(children: <Widget>[
+                      _getActualImageContainer(widget.actualImage),
+                      Text('Imagen actual', style: TextStyle(color: Colors.black54, fontSize: 12))
+                    ]))
+                : Container(),
           ],
         );
       },

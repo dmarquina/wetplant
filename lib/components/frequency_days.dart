@@ -60,7 +60,7 @@ class FrequencyDaysPure extends StatelessWidget {
                     )
                   ],
                 ),
-                Text('${value == 1 ? 'día' : 'días'}',
+                Text('${value == 1 ? 'día' : 'días'} aprox.',
                     style: TextStyle(color: Colors.black54, fontSize: 16)),
               ],
             )));

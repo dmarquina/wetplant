@@ -91,7 +91,7 @@ class ReminderInfoPanel extends StatelessWidget {
               SizedBox(height: 25),
               Container(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: <Widget>[
-                Text('FRECUENCIA',
+                Text('FRECUENCIA APROX.',
                     style: TextStyle(
                         fontWeight: FontWeight.w500, color: Colors.black38, fontSize: 12)),
                 Container(

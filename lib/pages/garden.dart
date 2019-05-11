@@ -21,7 +21,7 @@ class _GardenPageState extends State<GardenPage> {
           body: CustomScrollColor(
               child: !model.fetchingPlants
                   ? _buildTitleAndPlantList(model.gardenPlants)
-                  : CircularProgressIndicator()));
+                  : Center(child: CircularProgressIndicator())));
     });
   }
 

@@ -6,7 +6,7 @@ import 'package:wetplant/model/plant.dart';
 import 'package:wetplant/model/reminder.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
-import 'package:wetplant/util/decoration.dart';
+import 'package:wetplant/util/plant_name_box.dart';
 import 'package:wetplant/util/plant_list_image.dart';
 import 'package:wetplant/util/reminder_type.dart';
 

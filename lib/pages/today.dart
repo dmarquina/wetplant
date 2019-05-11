@@ -21,7 +21,7 @@ class _TodayPageState extends State<TodayPage> {
               padding: EdgeInsets.symmetric(horizontal: 10.0),
               child: !model.fetchingPlants
                   ? ListView(children: _buildPage(model))
-                  : CircularProgressIndicator()));
+                  : Center(child: CircularProgressIndicator())));
     });
   }
 

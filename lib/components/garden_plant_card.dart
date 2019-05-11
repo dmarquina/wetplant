@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/garden_plant.dart';
 import 'package:wetplant/model/reminder.dart';
 import 'package:wetplant/pages/plant_detail.dart';
-import 'package:wetplant/util/custom_icons_icons.dart';
-import 'package:wetplant/util/decoration.dart';
 import 'package:wetplant/util/plant_list_image.dart';
+import 'package:wetplant/util/plant_name_box.dart';
 import 'package:wetplant/util/reminder_info_widgets.dart';
-import 'package:wetplant/util/reminder_type.dart';
 
 class GardenPlantCard extends StatelessWidget {
   final GardenPlant gardenPlant;
@@ -17,20 +14,20 @@ class GardenPlantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PlantDetailPage(gardenPlant),
-        ),
-      );},
-      child: Container(
-          margin: EdgeInsets.symmetric(vertical: 5.0),
-          decoration: _declareGardenPlantCardDecoration(),
-          child: Column(children: <Widget>[
-            Row(children: <Widget>[PlantListImage(gardenPlant.plant.image, 120, 120), _buildPlantInfo()]),
-            PlantNameBox(gardenPlant.plant.name, 16)
-          ])),
-    );
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => PlantDetailPage(gardenPlant)));
+          },
+          child: Container(
+              margin: EdgeInsets.symmetric(vertical: 5.0),
+              decoration: _declareGardenPlantCardDecoration(),
+              child: Column(children: <Widget>[
+                Row(children: <Widget>[
+                  PlantListImage(gardenPlant.plant.image, 120, 120),
+                  _buildPlantInfo()
+                ]),
+                PlantNameBox(gardenPlant.plant.name, 16)
+              ])));
   }
 
   BoxDecoration _declareGardenPlantCardDecoration() {
@@ -48,12 +45,12 @@ class GardenPlantCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.only(right: 10.0),
         child: SingleChildScrollView(
-
           scrollDirection: Axis.horizontal,
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: gardenPlant.reminders.map((reminder) => _buildReminderInfo(reminder)).toList()),
+              children:
+                  gardenPlant.reminders.map((reminder) => _buildReminderInfo(reminder)).toList()),
         ),
       ),
     );
@@ -70,16 +67,12 @@ class GardenPlantCard extends StatelessWidget {
     children
         .add(buildTextInfo('Tiempo desde la última vez', reminder.daysWithoutAction.toString()));
     children.add(SizedBox(width: 20.0));
-    children.add(buildIconInfo('Frecuencia', Icons.autorenew));
-    children.add(buildTextInfo('Frecuencia', reminder.frequencyDays.toString()));
+    children.add(buildIconInfo('Frecuencia aprox.', Icons.autorenew));
+    children.add(buildTextInfo('Frecuencia aprox.', reminder.frequencyDays.toString()));
     if (reminder.postponedDays > 0) {
       children.add(buildIconInfo('Días pospuestos', Icons.add));
       children.add(buildTextInfo('Días pospuestos', reminder.postponedDays.toString()));
     }
     return children;
   }
-
-
-
-
 }
