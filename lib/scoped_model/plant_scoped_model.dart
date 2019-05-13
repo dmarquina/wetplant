@@ -7,7 +7,6 @@ import 'package:http_parser/http_parser.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/constants/constant_variables.dart';
 import 'package:wetplant/model/garden_plant.dart';
-import 'package:wetplant/model/plant.dart';
 import 'package:wetplant/model/reminder.dart';
 
 mixin PlantScopedModel on Model {
@@ -54,11 +53,16 @@ mixin PlantScopedModel on Model {
     await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
   }
 
-  updatePlant(Map<String, dynamic> jsonPlant, File imageFile) async {
+  updatePlant(Map<String, dynamic> jsonPlant, String imageURL, File imageFile) async {
     http.Response res = await http.put("$HOST:8080/plants/",
         body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
-//    if (imageFile != null) {
-//      await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
+    if (imageFile != null) {
+      await _updateImage(jsonDecode(res.body)['id'].toString(), imageURL, imageFile);
+    }
+  }
+
+  deletePlant(int id, String imageURL) async {
+    await http.delete("$HOST:8080/plants/$id", headers: {'Content-Type': 'application/json'});
   }
 
   updateLastDateAction(int reminderId, String lastDateAction, String ownerId) async {
@@ -82,6 +86,17 @@ mixin PlantScopedModel on Model {
     var request = new http.MultipartRequest("POST", url);
     request.headers['content-type'] = 'multipart/form-data';
     request.fields['id'] = id;
+    request.files.add(new http.MultipartFile.fromBytes("image", image.readAsBytesSync(),
+        contentType: MediaType.parse('multipart/form-data'), filename: 'image'));
+    return request.send();
+  }
+
+  Future<http.StreamedResponse> _updateImage(String id, String imageURL, File image) {
+    var url = Uri.parse("$HOST:8080/plants/updatedimage");
+    var request = new http.MultipartRequest("POST", url);
+    request.headers['content-type'] = 'multipart/form-data';
+    request.fields['id'] = id;
+    request.fields['imageURL'] = imageURL;
     request.files.add(new http.MultipartFile.fromBytes("image", image.readAsBytesSync(),
         contentType: MediaType.parse('multipart/form-data'), filename: 'image'));
     return request.send();

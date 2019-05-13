@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/components/frequency_days.dart';
 import 'package:wetplant/components/gradient_material_button.dart';
 import 'package:wetplant/components/last_action_date.dart';
 import 'package:wetplant/constants/available-reminders.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/reminder.dart';
-import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
 class ReminderCard extends StatefulWidget {
@@ -14,10 +12,8 @@ class ReminderCard extends StatefulWidget {
   final Function addReminder;
   final Function deleteReminder;
   Reminder reminder;
-  int countRemindersInMemory;
 
-  ReminderCard(this.availableReminder, this.addReminder, this.deleteReminder,
-      {this.reminder, this.countRemindersInMemory});
+  ReminderCard(this.availableReminder, this.addReminder, this.deleteReminder, {this.reminder});
 
   @override
   _ReminderCardState createState() => _ReminderCardState();
@@ -190,10 +186,6 @@ class _ReminderCardState extends State<ReminderCard> {
   }
 
   _deleteReminder() {
-    if (widget.countRemindersInMemory == 1) {
-      _openDialogOneReminderAtLeast();
-    }else{
-
     Reminder reminderToDelete;
     var idReminder = widget?.reminder?.id;
     if (idReminder != null) {
@@ -208,7 +200,6 @@ class _ReminderCardState extends State<ReminderCard> {
       _initValues();
       _reminderSelected = false;
     });
-    }
   }
 
   _initValues() {
@@ -221,32 +212,6 @@ class _ReminderCardState extends State<ReminderCard> {
       _datePicked = DateTime.now();
       _frequencyDays = widget.availableReminder.defaultFrequencyValue;
     }
-  }
-
-
-  _openDialogOneReminderAtLeast() {
-    showDialog(
-        context: context,
-        builder: (_) => SimpleDialog(
-            contentPadding: EdgeInsets.all(0),
-            title: Text('ESPERA', style: TextStyle(fontSize: 18.0)),
-            children: <Widget>[
-              Container(
-                  padding: EdgeInsets.only(top: 10.0, left: 25.0, right: 25.0),
-                  child: Text('Debes tener al menos un recordatorio activo')),
-              ButtonBar(
-                children: <Widget>[
-                  FlatButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8))),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('ENTIENDO'),
-                  ),
-                ],
-              )
-            ]));
   }
 
   BoxDecoration _buildCardBoxDecoration() {

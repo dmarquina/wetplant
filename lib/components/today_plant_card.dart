@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/components/action_modal.dart';
 import 'package:wetplant/constants/colors';
-import 'package:wetplant/model/plant.dart';
+import 'package:wetplant/model/garden_plant.dart';
 import 'package:wetplant/model/reminder.dart';
+import 'package:wetplant/pages/plant_detail.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
-import 'package:wetplant/util/plant_name_box.dart';
 import 'package:wetplant/util/plant_list_image.dart';
+import 'package:wetplant/util/plant_name_box.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
 class TodayPlantCard extends StatelessWidget {
-  final Plant plant;
-  final List<Reminder> reminders;
+  final GardenPlant gardenPlant;
   MainModel _model;
   BuildContext _context;
 
-  TodayPlantCard(this.plant, this.reminders);
+  TodayPlantCard(this.gardenPlant);
 
   @override
   Widget build(BuildContext context) {
@@ -24,15 +24,23 @@ class TodayPlantCard extends StatelessWidget {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       _model = model;
-      return Container(
-          child: Column(
-              children: <Widget>[_buildPlantImageRemindersStack(), PlantNameBox(plant.name, 14)]));
+      return GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PlantDetailPage(gardenPlant)));
+        },
+        child: Container(
+            child: Column(children: <Widget>[
+          _buildPlantImageRemindersStack(),
+          PlantNameBox(gardenPlant.plant.name, 14)
+        ])),
+      );
     });
   }
 
   Widget _buildPlantImageRemindersStack() {
     return Stack(children: <Widget>[
-      PlantListImage(plant.image, 170, 180),
+      PlantListImage(gardenPlant.plant.image, 170, 180),
       Positioned(left: 8, top: 8, child: _getReminderIcon())
     ]);
   }
@@ -42,7 +50,7 @@ class TodayPlantCard extends StatelessWidget {
         child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: reminders
+            children: gardenPlant.reminders
                 .where((reminder) => _model.predicateReminderToAttend(reminder))
                 .map((reminder) {
               return GestureDetector(
@@ -73,18 +81,19 @@ class TodayPlantCard extends StatelessWidget {
         context: _context,
         builder: (_) => ActionModal(
             reminder,
-            plant,
+            gardenPlant.plant,
             (daysToPostponed) => _postponedAction(reminder, daysToPostponed),
             (lastActionDate) => _onSubmitAction(reminder.id, lastActionDate)));
   }
 
   _postponedAction(Reminder reminder, int daysToPostponed) {
-    _model.updatePostponedDays(reminder.id, daysToPostponed,_model.ownerId);
+    int actualDaysToPostpone = reminder.postponedDays + daysToPostponed;
+    _model.updatePostponedDays(reminder.id, actualDaysToPostpone, _model.ownerId);
     Navigator.pop(_context);
   }
 
   _onSubmitAction(int reminderId, DateTime lastActionDate) {
-    _model.updateLastDateAction(reminderId, lastActionDate.toIso8601String(),_model.ownerId);
+    _model.updateLastDateAction(reminderId, lastActionDate.toIso8601String(), _model.ownerId);
     Navigator.pop(_context);
   }
 }

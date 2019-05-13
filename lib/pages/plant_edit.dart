@@ -14,41 +14,33 @@ import 'package:wetplant/pages/page_manager.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
-class EditPlantPage extends StatefulWidget {
+class PlantEditPage extends StatefulWidget {
   final GardenPlant gardenPlant;
 
-  EditPlantPage({this.gardenPlant});
+  PlantEditPage({this.gardenPlant});
 
   @override
-  EditPlantPageState createState() {
-    return new EditPlantPageState();
+  PlantEditPageState createState() {
+    return new PlantEditPageState();
   }
 }
 
-class EditPlantPageState extends State<EditPlantPage> {
+class PlantEditPageState extends State<PlantEditPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Map<ReminderType, Reminder> _reminders = Map();
+  Map<ReminderType, Reminder> _localReminders = Map();
+  List<int> _remindersToDelete = [];
 
+  bool _editing = false;
   final _nameTextController = TextEditingController(text: '');
   File _imageFile;
-  bool _editing = false;
-  String _appBarTitle = 'NUEVA PLANTA';
-  String _waitingMessage = 'Publicando tu nueva plantita';
-  String _buttonText = 'AGREGAR PLANTA';
-  String _actualImage;
-  bool _waitingAction = false;
   bool _valid = false;
-  RegExp numberRegExp = RegExp(r"^[0-9]*$");
+  bool _waitingAction = false;
 
   @override
   void initState() {
     if (widget.gardenPlant != null) {
       _editing = true;
       _nameTextController.text = widget.gardenPlant.plant.name;
-      _appBarTitle = 'EDITAR PLANTA';
-      _waitingMessage = 'Editando tu querida plantita';
-      _buttonText = 'EDITAR PLANTA';
-      _actualImage = widget.gardenPlant.plant.image;
       getReminderByType();
     }
     super.initState();
@@ -62,14 +54,13 @@ class EditPlantPageState extends State<EditPlantPage> {
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             CircularProgressIndicator(),
             SizedBox(height: 10.0),
-            Text(_waitingMessage)
+            Text('${_editing ? 'Editando tu querida' : 'Publicando tu nueva'} plantita')
           ])))
         : Scaffold(
             appBar: AppBar(
-              centerTitle: false,
-              elevation: 0.0,
-              title: Text(_appBarTitle),
-            ),
+                centerTitle: false,
+                elevation: 0.0,
+                title: Text('${_editing ? 'EDITAR' : 'NUEVA'} PLANTA')),
             body: ScopedModelDescendant<MainModel>(
                 builder: (BuildContext context, Widget child, MainModel model) {
               return CustomScrollColor(
@@ -84,7 +75,7 @@ class EditPlantPageState extends State<EditPlantPage> {
                               onSave: (File imageFileSource) {
                                 _setImageFile(imageFileSource);
                               },
-                              actualImage: _actualImage),
+                              actualImage: widget?.gardenPlant?.plant?.image ?? null),
                           _buildPlantNameField(),
                           SizedBox(height: 20.0),
                           Text('RECORDATORIOS',
@@ -126,12 +117,8 @@ class EditPlantPageState extends State<EditPlantPage> {
             crossAxisCount: 2,
             children: availableReminders.map((availableReminder) {
               return ReminderCard(
-                availableReminder,
-                (r) => _addReminders(r),
-                (r) => _deleteReminder(r),
-                reminder: _reminders[availableReminder.reminderType],
-                countRemindersInMemory: _reminders.length,
-              );
+                  availableReminder, (r) => _addReminders(r), (r) => _deleteReminder(r),
+                  reminder: _localReminders[availableReminder.reminderType]);
             }).toList()));
   }
 
@@ -150,18 +137,16 @@ class EditPlantPageState extends State<EditPlantPage> {
 
   _addReminders(Reminder reminder) {
     setState(() {
-      _reminders[reminder.reminderType] = reminder;
+      _localReminders[reminder.reminderType] = reminder;
     });
   }
 
   _deleteReminder(Reminder reminder) {
     if (reminder.id != null) {
-      //TODO: Metodo para eliminar en back
-      print(reminder.id);
-//        model.plantDetailReminders.removeWhere((r) => r.id == reminder.id);
+      _remindersToDelete.add(reminder.id);
     }
     setState(() {
-      _reminders.remove(reminder.reminderType);
+      _localReminders.remove(reminder.reminderType);
     });
   }
 
@@ -180,7 +165,7 @@ class EditPlantPageState extends State<EditPlantPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                '$_buttonText',
+                '${_editing ? 'EDITAR' : 'AGREGAR'} PLANTA',
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ],
@@ -196,7 +181,7 @@ class EditPlantPageState extends State<EditPlantPage> {
     if (!_formKey.currentState.validate()) {
       return;
     }
-    if (_reminders.isEmpty) {
+    if (_localReminders.isEmpty) {
       setState(() {
         _valid = true;
       });
@@ -209,13 +194,13 @@ class EditPlantPageState extends State<EditPlantPage> {
     });
     Map<String, dynamic> jsonNewPlant = {
       'id': _editing ? widget.gardenPlant.plant.id : null,
-      'image': _editing ? widget.gardenPlant.plant.image : null,
       'ownerId': model.ownerId,
       'name': _nameTextController.text,
-      'reminders': _getJsonReminders(_reminders)
+      'reminders': _getJsonReminders(_localReminders),
+      'remindersToDelete': _remindersToDelete
     };
     _editing
-        ? await model.updatePlant(jsonNewPlant, _imageFile)
+        ? await model.updatePlant(jsonNewPlant,widget.gardenPlant.plant.image, _imageFile)
         : await model.addPlant(jsonNewPlant, _imageFile);
     Navigator.pushReplacement(context,
         MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage(model)));

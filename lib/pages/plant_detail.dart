@@ -4,7 +4,8 @@ import 'package:wetplant/components/custom_scroll_color.dart';
 import 'package:wetplant/components/delete_dialog.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/garden_plant.dart';
-import 'package:wetplant/pages/edit_plant.dart';
+import 'package:wetplant/pages/page_manager.dart';
+import 'package:wetplant/pages/plant_edit.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/plant_list_image.dart';
 import 'package:wetplant/util/reminder_info_panel_carousel.dart';
@@ -19,18 +20,28 @@ class PlantDetailPage extends StatefulWidget {
 }
 
 class _PlantDetailPageState extends State<PlantDetailPage> {
+  bool _waitingAction = false;
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     Orientation orientation = MediaQuery.of(context).orientation;
     var imageHeight = orientation == Orientation.portrait ? size.height / 1.8 : size.height * 1.8;
     var imageWidth = size.width;
-    return Scaffold(
+    return _waitingAction
+        ? Scaffold(
+            body: Center(
+                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            CircularProgressIndicator(),
+            SizedBox(height: 10.0),
+            Text('Eliminando tu plantita')
+          ])))
+        : Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
                 iconTheme: IconThemeData(color: Colors.black45),
                 title: Text(widget.gardenPlant.plant.name.toUpperCase(),
-                    style: TextStyle(fontSize: 16, color: GreenMain)),
+                    style: TextStyle(color: GreenMain)),
                 backgroundColor: Colors.white,
                 centerTitle: true,
                 elevation: 0.0,
@@ -58,11 +69,12 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 Hero(
                     tag: widget.gardenPlant.plant.id,
                     child: Container(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                          PlantListImage(widget.gardenPlant.plant.image, imageHeight, imageWidth,
-                              borderRadius: BorderRadius.all(Radius.circular(0))),
-                          ReminderInfoPanelCarousel(reminders: widget.gardenPlant.reminders),
-                        ])))
+                        child:
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                      PlantListImage(widget.gardenPlant.plant.image, imageHeight, imageWidth,
+                          borderRadius: BorderRadius.all(Radius.circular(0))),
+                      ReminderInfoPanelCarousel(reminders: widget.gardenPlant.reminders),
+                    ])))
               ]),
             ));
   }
@@ -74,7 +86,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditPlantPage(gardenPlant: widget.gardenPlant),
+          builder: (context) => PlantEditPage(gardenPlant: widget.gardenPlant),
         ),
       );
     }
@@ -83,19 +95,29 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
   void openDeleteDialog(BuildContext context) {
     showDialog(
         context: context,
-        builder: (_) => DeleteDialog(
-              name: widget.gardenPlant.plant.name.toUpperCase(),
-              onRemove: (context) {
-                try {
-                  print(widget.gardenPlant.plant.id);
-//              database.deleteFlower(widget.flower.key);
-                } catch (e) {
-                  print(e.toString());
-                  Navigator.of(context).pop();
-                }
-                Navigator.pop(context);
-              },
-            ));
+        builder: (_) => ScopedModelDescendant<MainModel>(
+                builder: (BuildContext context, Widget child, MainModel model) {
+              return DeleteDialog(
+                  name: widget.gardenPlant.plant.name.toUpperCase(),
+                  onRemove: (context) {
+                    Navigator.of(context).pop();
+                    try {
+                      setState(() {
+                        _waitingAction = true;
+                      });
+                      deletePlant(model);
+                    } catch (e) {
+                      print(e.toString());
+                      Navigator.of(context).pop();
+                    }
+                  });
+            }));
+  }
+
+  deletePlant(MainModel model) async {
+    await model.deletePlant(widget.gardenPlant.plant.id, widget.gardenPlant.plant.image);
+    Navigator.pushReplacement(context,
+        MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage(model)));
   }
 }
 

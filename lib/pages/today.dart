@@ -55,7 +55,7 @@ class _TodayPageState extends State<TodayPage> {
           mainAxisSpacing: 5.0,
           crossAxisSpacing: 20.0,
           crossAxisCount: 2,
-          children: model.todayPlants.map((gp) => TodayPlantCard(gp.plant, gp.reminders)).toList()),
+          children: model.todayPlants.map((gp) => TodayPlantCard(gp)).toList()),
     );
   }
 }
