@@ -19,7 +19,7 @@ class _TodayPageState extends State<TodayPage> {
       return CustomScrollColor(
           child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: !model.fetchingPlants
+              child: !model.actionInProgress
                   ? ListView(children: _buildPage(model))
                   : Center(child: CircularProgressIndicator())));
     });

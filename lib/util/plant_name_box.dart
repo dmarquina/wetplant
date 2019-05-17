@@ -3,8 +3,9 @@ import 'package:wetplant/constants/colors';
 
 class PlantNameBox extends StatelessWidget {
   final String plantName;
+  final LinearGradient gradientColor;
   final double fontSize;
-  PlantNameBox(this.plantName,this.fontSize);
+  PlantNameBox(this.plantName,this.gradientColor,{this.fontSize =14});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class PlantNameBox extends StatelessWidget {
         alignment: Alignment.centerLeft,
         padding: EdgeInsets.only(left: 10),
         decoration: BoxDecoration(
-          gradient: GreenGradient,
+          gradient: gradientColor,
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(5)),
           boxShadow: <BoxShadow>[
             BoxShadow(

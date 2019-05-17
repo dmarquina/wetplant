@@ -7,6 +7,7 @@ import 'package:wetplant/model/reminder.dart';
 import 'package:wetplant/pages/plant_detail.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
+import 'package:wetplant/util/handle_linear_color_action.dart';
 import 'package:wetplant/util/plant_list_image.dart';
 import 'package:wetplant/util/plant_name_box.dart';
 import 'package:wetplant/util/reminder_type.dart';
@@ -32,7 +33,8 @@ class TodayPlantCard extends StatelessWidget {
         child: Container(
             child: Column(children: <Widget>[
           _buildPlantImageRemindersStack(),
-          PlantNameBox(gardenPlant.plant.name, 14)
+          PlantNameBox(gardenPlant.plant.name,
+              HandleLinearColorAction.getLinearColorsForAction(gardenPlant.reminders))
         ])),
       );
     });

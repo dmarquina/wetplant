@@ -196,6 +196,7 @@ class PlantEditPageState extends State<PlantEditPage> {
       'id': _editing ? widget.gardenPlant.plant.id : null,
       'ownerId': model.ownerId,
       'name': _nameTextController.text,
+      'image': widget.gardenPlant.plant.image,
       'reminders': _getJsonReminders(_localReminders),
       'remindersToDelete': _remindersToDelete
     };

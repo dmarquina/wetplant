@@ -13,7 +13,7 @@ mixin PlantScopedModel on Model {
   List<GardenPlant> gardenPlants = new List();
   List<GardenPlant> todayPlants = new List();
   List<Reminder> plantDetailReminders = new List();
-  bool fetchingPlants = false;
+  bool actionInProgress = false;
 
   List<GardenPlant> _getTodayPlant(List<GardenPlant> gardenPlants) {
     return gardenPlants.where((gp) => checkIfReminderToAttend(gp) != null).toList() ?? [];
@@ -29,13 +29,13 @@ mixin PlantScopedModel on Model {
   }
 
   getPlants(String userId) {
-    fetchingPlants = true;
+    actionInProgress = true;
     notifyListeners();
     http.get("$HOST:8080/plants/users/$userId").then((res) {
       List<dynamic> jsonDecoded = jsonDecode(res.body);
       gardenPlants = jsonDecoded.map((json) => GardenPlant.fromJson(json)).toList();
       todayPlants = _getTodayPlant(gardenPlants);
-      fetchingPlants = false;
+      actionInProgress = false;
       notifyListeners();
     });
   }
@@ -66,6 +66,8 @@ mixin PlantScopedModel on Model {
   }
 
   updateLastDateAction(int reminderId, String lastDateAction, String ownerId) async {
+    actionInProgress=true;
+    notifyListeners();
     await http.patch('$HOST:8080/reminders/$reminderId/lastdateaction',
         body: jsonEncode({'lastDateAction': lastDateAction}),
         headers: {'Content-Type': 'application/json'});
@@ -74,6 +76,8 @@ mixin PlantScopedModel on Model {
   }
 
   updatePostponedDays(int reminderId, int postponedDays, String ownerId) async {
+    actionInProgress=true;
+    notifyListeners();
     await http.patch('$HOST:8080/reminders/$reminderId/postponeddays',
         body: jsonEncode({'postponedDays': postponedDays}),
         headers: {'Content-Type': 'application/json'});

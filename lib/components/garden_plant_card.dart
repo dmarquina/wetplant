@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wetplant/model/garden_plant.dart';
 import 'package:wetplant/model/reminder.dart';
 import 'package:wetplant/pages/plant_detail.dart';
+import 'package:wetplant/util/handle_linear_color_action.dart';
 import 'package:wetplant/util/plant_list_image.dart';
 import 'package:wetplant/util/plant_name_box.dart';
 import 'package:wetplant/util/reminder_info_widgets.dart';
@@ -14,20 +15,22 @@ class GardenPlantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => PlantDetailPage(gardenPlant)));
-          },
-          child: Container(
-              margin: EdgeInsets.symmetric(vertical: 5.0),
-              decoration: _declareGardenPlantCardDecoration(),
-              child: Column(children: <Widget>[
-                Row(children: <Widget>[
-                  PlantListImage(gardenPlant.plant.image, 120, 120),
-                  _buildPlantInfo()
-                ]),
-                PlantNameBox(gardenPlant.plant.name, 16)
-              ])));
+        onTap: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PlantDetailPage(gardenPlant)));
+        },
+        child: Container(
+            margin: EdgeInsets.symmetric(vertical: 5.0),
+            decoration: _declareGardenPlantCardDecoration(),
+            child: Column(children: <Widget>[
+              Row(children: <Widget>[
+                PlantListImage(gardenPlant.plant.image, 120, 120),
+                _buildPlantInfo()
+              ]),
+              PlantNameBox(gardenPlant.plant.name,
+                  HandleLinearColorAction.getLinearColorsForAction(gardenPlant.reminders),
+                  fontSize: 16)
+            ])));
   }
 
   BoxDecoration _declareGardenPlantCardDecoration() {

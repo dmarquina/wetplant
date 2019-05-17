@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wetplant/components/custom_scroll_color.dart';
 import 'package:wetplant/components/fab_bottom_app_bar.dart';
 import 'package:wetplant/constants/colors';
+import 'package:wetplant/pages/garden.dart';
 import 'package:wetplant/pages/plant_edit.dart';
 import 'package:wetplant/pages/garden.dart';
 import 'package:wetplant/pages/today.dart';
@@ -32,9 +33,7 @@ class _PageManagerPageState extends State<PageManagerPage> {
         body: Center(
           child: SafeArea(
               child: Scaffold(
-            body: CustomScrollColor(
-              child: _widgetOptions.elementAt(_selectedIndex),
-            ),
+            body:  _widgetOptions.elementAt(_selectedIndex),
           )),
         ),
         floatingActionButton: FloatingActionButton(

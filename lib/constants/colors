@@ -47,8 +47,8 @@ const RedGradient = LinearGradient(
   end: Alignment.bottomRight,
   stops: [0.1, 0.9],
   colors: [
-    RedMain,
-    RedSecond
+    RedSecond,
+    RedMain
   ],
 );
 
