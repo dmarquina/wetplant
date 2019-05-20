@@ -32,9 +32,8 @@ class _PageManagerPageState extends State<PageManagerPage> {
     return Scaffold(
         body: Center(
           child: SafeArea(
-              child: Scaffold(
-            body:  _widgetOptions.elementAt(_selectedIndex),
-          )),
+            child: _widgetOptions.elementAt(_selectedIndex),
+          ),
         ),
         floatingActionButton: FloatingActionButton(
             backgroundColor: GreenMain,

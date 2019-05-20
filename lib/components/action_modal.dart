@@ -23,7 +23,6 @@ class ActionModal extends StatefulWidget {
 
 class _ActionModalState extends State<ActionModal> {
   DateTime datePicked;
-  ReminderType rType;
   int daysToPostpone;
   AvailableReminder availableReminder;
 
@@ -77,7 +76,7 @@ class _ActionModalState extends State<ActionModal> {
         width: 120,
         buttonRadius: BorderRadius.all(Radius.circular(8)),
         onPressed: () => widget.onSubmitAction(datePicked),
-        child: Text(rType == ReminderType.Water ? 'REGAR' : 'FERTILIZAR',
+        child: Text(availableReminder.action.toUpperCase(),
             style: TextStyle(fontSize: 16, color: Colors.white)));
   }
 
@@ -132,6 +131,5 @@ class _ActionModalState extends State<ActionModal> {
     availableReminder = getAvailableReminderByType(widget.reminder.reminderType);
     daysToPostpone = 1;
     datePicked = DateTime.now();
-    rType = availableReminder.reminderType;
   }
 }

@@ -65,21 +65,21 @@ mixin PlantScopedModel on Model {
     await http.delete("$HOST:8080/plants/$id", headers: {'Content-Type': 'application/json'});
   }
 
-  updateLastDateAction(int reminderId, String lastDateAction, String ownerId) async {
+  updateLastDateAction(List<int> reminderIds, String lastDateAction, String ownerId) async {
     actionInProgress=true;
     notifyListeners();
-    await http.patch('$HOST:8080/reminders/$reminderId/lastdateaction',
-        body: jsonEncode({'lastDateAction': lastDateAction}),
+    await http.patch('$HOST:8080/reminders/lastdateaction',
+        body: jsonEncode({'reminderIds':reminderIds,'lastDateAction': lastDateAction}),
         headers: {'Content-Type': 'application/json'});
     this.getPlants(ownerId);
     notifyListeners();
   }
 
-  updatePostponedDays(int reminderId, int postponedDays, String ownerId) async {
+  updatePostponedDays(List<int> reminderIds, int postponedDays, String ownerId) async {
     actionInProgress=true;
     notifyListeners();
-    await http.patch('$HOST:8080/reminders/$reminderId/postponeddays',
-        body: jsonEncode({'postponedDays': postponedDays}),
+    await http.patch('$HOST:8080/reminders/postponeddays',
+        body: jsonEncode({'reminderIds':reminderIds,'postponedDays': postponedDays}),
         headers: {'Content-Type': 'application/json'});
     this.getPlants(ownerId);
     notifyListeners();

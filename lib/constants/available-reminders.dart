@@ -5,6 +5,7 @@ import 'package:wetplant/util/reminder_type.dart';
 
 class AvailableReminder {
   final String title;
+  final String action;
   final IconData iconData;
   final Color primaryColor;
   final Color accentColor;
@@ -13,12 +14,13 @@ class AvailableReminder {
   final int defaultFrequencyValue;
   final ReminderType reminderType;
 
-  AvailableReminder(this.title, this.iconData, this.primaryColor, this.accentColor,
+  AvailableReminder(this.title, this.action, this.iconData, this.primaryColor, this.accentColor,
       this.gradientColor, this.size, this.defaultFrequencyValue, this.reminderType);
 }
 
 AvailableReminder availableWaterReminder = AvailableReminder(
     'Riego',
+    'Regar',
     CustomIcons.water_amount_small,
     ReminderBlueMain,
     ReminderBlueSecond,
@@ -26,8 +28,8 @@ AvailableReminder availableWaterReminder = AvailableReminder(
     40.0,
     7,
     ReminderType.Water);
-AvailableReminder availableFertilizeReminder = AvailableReminder('Fertilizar', Icons.flash_on,
-    BrownMain, BrownSecond, BrownGradient, 25.0, 30, ReminderType.Fertilize);
+AvailableReminder availableFertilizeReminder = AvailableReminder('Fertilizar', 'Fertilizar',
+    Icons.flash_on, BrownMain, BrownSecond, BrownGradient, 25.0, 30, ReminderType.Fertilize);
 
 List<AvailableReminder> availableReminders = [
   availableWaterReminder,

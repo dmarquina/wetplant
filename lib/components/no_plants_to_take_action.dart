@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/util/custom_icons_icons.dart';
 
-class NoFlowersToWater extends StatelessWidget {
+class NoPlantsToTakeAction extends StatelessWidget {
   final bool hasCompleted;
   final bool hasNoFlowers;
 
-  NoFlowersToWater({this.hasCompleted, this.hasNoFlowers});
+  NoPlantsToTakeAction({this.hasCompleted, this.hasNoFlowers});
 
   @override
   Widget build(BuildContext context) {

@@ -54,7 +54,7 @@ class PlantEditPageState extends State<PlantEditPage> {
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             CircularProgressIndicator(),
             SizedBox(height: 10.0),
-            Text('${_editing ? 'Editando tu querida' : 'Publicando tu nueva'} plantita')
+            Text('${_editing ? 'Editando tu querida' : 'Creando tu nueva'} plantita')
           ])))
         : Scaffold(
             appBar: AppBar(
@@ -196,7 +196,7 @@ class PlantEditPageState extends State<PlantEditPage> {
       'id': _editing ? widget.gardenPlant.plant.id : null,
       'ownerId': model.ownerId,
       'name': _nameTextController.text,
-      'image': widget.gardenPlant.plant.image,
+      'image': widget?.gardenPlant?.plant?.image??'',
       'reminders': _getJsonReminders(_localReminders),
       'remindersToDelete': _remindersToDelete
     };

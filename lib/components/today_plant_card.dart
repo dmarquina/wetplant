@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/components/action_modal.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/garden_plant.dart';
 import 'package:wetplant/model/reminder.dart';
-import 'package:wetplant/pages/plant_detail.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
 import 'package:wetplant/util/handle_linear_color_action.dart';
@@ -14,30 +12,57 @@ import 'package:wetplant/util/reminder_type.dart';
 
 class TodayPlantCard extends StatelessWidget {
   final GardenPlant gardenPlant;
-  MainModel _model;
+  final MainModel model;
+  final bool isSelected;
+  final Function(GardenPlant gardenPlant) onPress;
+  final Function(GardenPlant gardenPlant) onLongPress;
   BuildContext _context;
 
-  TodayPlantCard(this.gardenPlant);
+  TodayPlantCard(this.gardenPlant, this.model, this.isSelected,
+      {@required this.onPress, @required this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
     _context = context;
-    return ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget child, MainModel model) {
-      _model = model;
-      return GestureDetector(
+    return GestureDetector(
         onTap: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => PlantDetailPage(gardenPlant)));
+          onPress(gardenPlant);
         },
+        onLongPress: () {
+          onLongPress(gardenPlant);
+        },
+        child: Stack(children: <Widget>[
+          _buildTodayCard(),
+          isSelected ? _getSelectedOverlay() : Container()
+        ]));
+  }
+
+  Widget _getSelectedOverlay() {
+    return Positioned(
         child: Container(
-            child: Column(children: <Widget>[
-          _buildPlantImageRemindersStack(),
-          PlantNameBox(gardenPlant.plant.name,
-              HandleLinearColorAction.getLinearColorsForAction(gardenPlant.reminders))
-        ])),
-      );
-    });
+      width: 180,
+      height: 210,
+      decoration: BoxDecoration(
+        color: Colors.grey.withAlpha(200),
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.check,
+          size: 64,
+          color: Colors.white,
+        ),
+      ),
+    ));
+  }
+
+  Widget _buildTodayCard() {
+    return Container(
+        child: Column(children: <Widget>[
+      _buildPlantImageRemindersStack(),
+      PlantNameBox(gardenPlant.plant.name,
+          HandleLinearColorAction.getLinearColorsForAction(gardenPlant.reminders))
+    ]));
   }
 
   Widget _buildPlantImageRemindersStack() {
@@ -53,7 +78,7 @@ class TodayPlantCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: gardenPlant.reminders
-                .where((reminder) => _model.predicateReminderToAttend(reminder))
+                .where((reminder) => model.predicateReminderToAttend(reminder))
                 .map((reminder) {
               return GestureDetector(
                   onTap: () => _openActionDialog(reminder),
@@ -90,12 +115,12 @@ class TodayPlantCard extends StatelessWidget {
 
   _postponedAction(Reminder reminder, int daysToPostponed) {
     int actualDaysToPostpone = reminder.postponedDays + daysToPostponed;
-    _model.updatePostponedDays(reminder.id, actualDaysToPostpone, _model.ownerId);
+    model.updatePostponedDays([reminder.id], actualDaysToPostpone, model.ownerId);
     Navigator.pop(_context);
   }
 
   _onSubmitAction(int reminderId, DateTime lastActionDate) {
-    _model.updateLastDateAction(reminderId, lastActionDate.toIso8601String(), _model.ownerId);
+    model.updateLastDateAction([reminderId], lastActionDate.toIso8601String(), model.ownerId);
     Navigator.pop(_context);
   }
 }

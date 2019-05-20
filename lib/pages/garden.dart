@@ -34,30 +34,27 @@ class _GardenPageState extends State<GardenPage> with SingleTickerProviderStateM
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(140.0),
-          child: AppBar(
-              automaticallyImplyLeading: false,
-              // hides leading widget
-              flexibleSpace:
-                  PageTitle(title: 'Jardín', padding: EdgeInsets.only(top: 20, left: 10)),
-              backgroundColor: Colors.white,
-              elevation: 0,
-              centerTitle: false,
-              bottom: TabBar(
-                  labelColor: GreenMain,
-                  controller: _tabController,
-                  tabs: [Tab(icon: Icon(Icons.view_list)), Tab(icon: Icon(Icons.grid_on))])),
-        ),
-        body: CustomScrollColor(
-            child: !model.actionInProgress
-                ? Container(
-                    margin: EdgeInsets.only(top: 5),
-                    child: TabBarView(
-                        controller: _tabController, children: _buildTabViewContent(model)))
-                : Center(child: CircularProgressIndicator())),
-      );
+          backgroundColor: Colors.white,
+          appBar: PreferredSize(
+              preferredSize: Size.fromHeight(140.0),
+              child: AppBar(
+                  automaticallyImplyLeading: false,
+                  flexibleSpace:
+                      PageTitle(title: 'Jardín', padding: EdgeInsets.only(top: 20, left: 10)),
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  centerTitle: false,
+                  bottom: TabBar(
+                      labelColor: GreenMain,
+                      controller: _tabController,
+                      tabs: [Tab(icon: Icon(Icons.view_list)), Tab(icon: Icon(Icons.grid_on))]))),
+          body: CustomScrollColor(
+              child: !model.actionInProgress
+                  ? Container(
+                      margin: EdgeInsets.only(top: 5),
+                      child: TabBarView(
+                          controller: _tabController, children: _buildTabViewContent(model)))
+                  : Center(child: CircularProgressIndicator())));
     });
   }
 
