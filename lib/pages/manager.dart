@@ -23,7 +23,7 @@ class _PageManagerPageState extends State<PageManagerPage> {
 
   @override
   void initState() {
-    widget.model.getPlants(widget.model.ownerId);
+    widget.model.getPlants(widget.model.authenticatedUser.id);
     super.initState();
   }
 

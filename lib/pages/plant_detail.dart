@@ -4,9 +4,10 @@ import 'package:wetplant/components/custom_scroll_color.dart';
 import 'package:wetplant/components/delete_dialog.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/garden_plant.dart';
-import 'package:wetplant/pages/page_manager.dart';
+import 'package:wetplant/pages/manager.dart';
 import 'package:wetplant/pages/plant_edit.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
+import 'package:wetplant/util/menu_choice.dart';
 import 'package:wetplant/util/plant_list_image.dart';
 import 'package:wetplant/util/reminder_info_panel_carousel.dart';
 
@@ -46,20 +47,20 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 centerTitle: true,
                 elevation: 0.0,
                 actions: <Widget>[
-                  PopupMenuButton<_MenuChoice>(
+                  PopupMenuButton<MenuChoice>(
                       icon: Icon(Icons.more_vert),
-                      onSelected: (_menuChoice) {
-                        _select(_menuChoice, context);
+                      onSelected: (menuChoice) {
+                        _select(menuChoice, context);
                       },
                       itemBuilder: (BuildContext context) {
                         return [
-                          PopupMenuItem<_MenuChoice>(
-                            value: _menuChoices[0],
-                            child: Text(_menuChoices[0].title),
+                          PopupMenuItem<MenuChoice>(
+                            value: plantDetailMenuChoices[0],
+                            child: Text(plantDetailMenuChoices[0].title),
                           ),
-                          PopupMenuItem<_MenuChoice>(
-                            value: _menuChoices[1],
-                            child: Text(_menuChoices[1].title),
+                          PopupMenuItem<MenuChoice>(
+                            value: plantDetailMenuChoices[1],
+                            child: Text(plantDetailMenuChoices[1].title),
                           )
                         ];
                       })
@@ -79,7 +80,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
             ));
   }
 
-  void _select(_MenuChoice _menuChoice, BuildContext context) {
+  void _select(MenuChoice _menuChoice, BuildContext context) {
     if (_menuChoice.type == 'delete') {
       openDeleteDialog(context);
     } else if (_menuChoice.type == 'edit') {
@@ -120,15 +121,3 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
         MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage(model)));
   }
 }
-
-class _MenuChoice {
-  final String title;
-  final String type;
-
-  const _MenuChoice({this.title, this.type});
-}
-
-const List<_MenuChoice> _menuChoices = [
-  _MenuChoice(title: 'Editar', type: 'edit'),
-  _MenuChoice(title: 'Eliminar', type: 'delete'),
-];

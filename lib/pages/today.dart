@@ -6,8 +6,10 @@ import 'package:wetplant/components/page_title.dart';
 import 'package:wetplant/components/quick_action_bar/quick_action_bar.dart';
 import 'package:wetplant/components/today_plant_card.dart';
 import 'package:wetplant/model/garden_plant.dart';
+import 'package:wetplant/pages/login.dart';
 import 'package:wetplant/pages/plant_detail.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
+import 'package:wetplant/util/menu_choice.dart';
 
 class TodayPage extends StatefulWidget {
   @override
@@ -24,19 +26,32 @@ class _TodayPageState extends State<TodayPage> {
       return Scaffold(
           backgroundColor: Colors.white,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(_selectedIds.length >= 1 ? 160.0 : 120),
-            child: AppBar(
-                automaticallyImplyLeading: false,
-                flexibleSpace: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
+              preferredSize: Size.fromHeight(_selectedIds.length >= 1 ? 160.0 : 120),
+              child: AppBar(
+                  automaticallyImplyLeading: false,
+                  flexibleSpace:
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
                       PageTitle(title: 'Hoy', padding: EdgeInsets.only(top: 20, left: 10)),
-                      _buildQuickActionBar(model)
+                      PopupMenuButton<MenuChoice>(padding: EdgeInsets.only(top: 20),
+                          icon: Icon(Icons.more_vert, color: Colors.black26),
+                          onSelected: (menuChoice) {
+                            model.logout();
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => LoginPage()));
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return [
+                              PopupMenuItem<MenuChoice>(
+                                  value: userMenuChoices[0], child: Text(userMenuChoices[0].title))
+                            ];
+                          })
                     ]),
-                backgroundColor: Colors.white,
-                elevation: 0,
-                centerTitle: false),
-          ),
+                    _buildQuickActionBar(model)
+                  ]),
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  centerTitle: false)),
           body: CustomScrollColor(
               child: Container(
                   child: !model.actionInProgress

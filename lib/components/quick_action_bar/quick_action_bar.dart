@@ -27,7 +27,7 @@ class QuickActionBarState extends State<QuickActionBar> {
           .forEach((reminder) => remindersToAttendIds.add(reminder.id));
     });
     widget.model.updateLastDateAction(
-        remindersToAttendIds, newDateOfAction.toIso8601String(), widget.model.ownerId);
+        remindersToAttendIds, newDateOfAction.toIso8601String(), widget.model.authenticatedUser.id);
     widget.onAction();
     Navigator.of(context).pop();
   }
@@ -39,7 +39,8 @@ class QuickActionBarState extends State<QuickActionBar> {
           .where((reminder) => widget.model.predicateReminderToAttend(reminder))
           .forEach((reminder) => remindersToPostponeIds.add(reminder.id));
     });
-    widget.model.updatePostponedDays(remindersToPostponeIds, days, widget.model.ownerId);
+    widget.model
+        .updatePostponedDays(remindersToPostponeIds, days, widget.model.authenticatedUser.id);
     widget.onAction();
     Navigator.of(context).pop();
   }
@@ -53,7 +54,7 @@ class QuickActionBarState extends State<QuickActionBar> {
           .forEach((reminder) => remindersToAttendIds.add(reminder.id));
     });
     widget.model.updateLastDateAction(
-        remindersToAttendIds, newDateOfAction.toIso8601String(), widget.model.ownerId);
+        remindersToAttendIds, newDateOfAction.toIso8601String(), widget.model.authenticatedUser.id);
     widget.onAction();
     Navigator.of(context).pop();
   }
@@ -66,7 +67,8 @@ class QuickActionBarState extends State<QuickActionBar> {
               widget.model.predicateReminderToAttend(reminder) && reminder.reminderType == type)
           .forEach((reminder) => remindersToPostponeIds.add(reminder.id));
     });
-    widget.model.updatePostponedDays(remindersToPostponeIds, days, widget.model.ownerId);
+    widget.model
+        .updatePostponedDays(remindersToPostponeIds, days, widget.model.authenticatedUser.id);
     widget.onAction();
     Navigator.of(context).pop();
   }

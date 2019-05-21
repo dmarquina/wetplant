@@ -50,14 +50,16 @@ mixin PlantScopedModel on Model {
   addPlant(Map<String, dynamic> jsonPlant, File imageFile) async {
     http.Response res = await http.post("$HOST:8080/plants/",
         body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
-    await _addImage(jsonDecode(res.body)['id'].toString(), imageFile);
+      await _addImage(
+          jsonDecode(res.body)['id'].toString(), jsonDecode(res.body)['ownerId'], imageFile);
   }
 
   updatePlant(Map<String, dynamic> jsonPlant, String imageURL, File imageFile) async {
     http.Response res = await http.put("$HOST:8080/plants/",
         body: jsonEncode(jsonPlant), headers: {'Content-Type': 'application/json'});
     if (imageFile != null) {
-      await _updateImage(jsonDecode(res.body)['id'].toString(), imageURL, imageFile);
+      await _updateImage(jsonDecode(res.body)['id'].toString(), jsonDecode(res.body)['ownerId'],
+          imageURL, imageFile);
     }
   }
 
@@ -66,40 +68,43 @@ mixin PlantScopedModel on Model {
   }
 
   updateLastDateAction(List<int> reminderIds, String lastDateAction, String ownerId) async {
-    actionInProgress=true;
+    actionInProgress = true;
     notifyListeners();
     await http.patch('$HOST:8080/reminders/lastdateaction',
-        body: jsonEncode({'reminderIds':reminderIds,'lastDateAction': lastDateAction}),
+        body: jsonEncode({'reminderIds': reminderIds, 'lastDateAction': lastDateAction}),
         headers: {'Content-Type': 'application/json'});
     this.getPlants(ownerId);
     notifyListeners();
   }
 
   updatePostponedDays(List<int> reminderIds, int postponedDays, String ownerId) async {
-    actionInProgress=true;
+    actionInProgress = true;
     notifyListeners();
     await http.patch('$HOST:8080/reminders/postponeddays',
-        body: jsonEncode({'reminderIds':reminderIds,'postponedDays': postponedDays}),
+        body: jsonEncode({'reminderIds': reminderIds, 'postponedDays': postponedDays}),
         headers: {'Content-Type': 'application/json'});
     this.getPlants(ownerId);
     notifyListeners();
   }
 
-  Future<http.StreamedResponse> _addImage(String id, File image) {
+  Future<http.StreamedResponse> _addImage(String plantId, String ownerId, File image) {
     var url = Uri.parse("$HOST:8080/plants/image");
     var request = new http.MultipartRequest("POST", url);
     request.headers['content-type'] = 'multipart/form-data';
-    request.fields['id'] = id;
+    request.fields['plantId'] = plantId;
+    request.fields['ownerId'] = ownerId;
     request.files.add(new http.MultipartFile.fromBytes("image", image.readAsBytesSync(),
         contentType: MediaType.parse('multipart/form-data'), filename: 'image'));
     return request.send();
   }
 
-  Future<http.StreamedResponse> _updateImage(String id, String imageURL, File image) {
+  Future<http.StreamedResponse> _updateImage(
+      String plantId, String ownerId, String imageURL, File image) {
     var url = Uri.parse("$HOST:8080/plants/updatedimage");
     var request = new http.MultipartRequest("POST", url);
     request.headers['content-type'] = 'multipart/form-data';
-    request.fields['id'] = id;
+    request.fields['plantId'] = plantId;
+    request.fields['ownerId'] = ownerId;
     request.fields['imageURL'] = imageURL;
     request.files.add(new http.MultipartFile.fromBytes("image", image.readAsBytesSync(),
         contentType: MediaType.parse('multipart/form-data'), filename: 'image'));

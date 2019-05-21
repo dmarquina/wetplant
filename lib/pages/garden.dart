@@ -6,8 +6,10 @@ import 'package:wetplant/components/page_title.dart';
 import 'package:wetplant/components/garden_plant_card.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/garden_plant.dart';
+import 'package:wetplant/pages/login.dart';
 import 'package:wetplant/pages/plant_detail.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
+import 'package:wetplant/util/menu_choice.dart';
 
 class GardenPage extends StatefulWidget {
   @override
@@ -39,8 +41,23 @@ class _GardenPageState extends State<GardenPage> with SingleTickerProviderStateM
               preferredSize: Size.fromHeight(140.0),
               child: AppBar(
                   automaticallyImplyLeading: false,
-                  flexibleSpace:
-                      PageTitle(title: 'Jardín', padding: EdgeInsets.only(top: 20, left: 10)),
+                  flexibleSpace: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: <Widget>[
+                    PageTitle(title: 'Jardín', padding: EdgeInsets.only(top: 20, left: 10)),
+                    PopupMenuButton<MenuChoice>(
+                        padding: EdgeInsets.only(top: 20),
+                        icon: Icon(Icons.more_vert, color: Colors.black26),
+                        onSelected: (menuChoice) {
+                          model.logout();
+                          Navigator.push(
+                              context, MaterialPageRoute(builder: (context) => LoginPage()));
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return [
+                            PopupMenuItem<MenuChoice>(
+                                value: userMenuChoices[0], child: Text(userMenuChoices[0].title))
+                          ];
+                        })
+                  ]),
                   backgroundColor: Colors.white,
                   elevation: 0,
                   centerTitle: false,

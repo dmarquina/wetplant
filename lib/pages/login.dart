@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:wetplant/components/custom_scroll_color.dart';
 import 'package:wetplant/constants/colors';
-import 'package:wetplant/pages/page_manager.dart';
-import 'dart:convert';
-
-import 'package:wetplant/pages/plants.dart';
+import 'package:wetplant/pages/manager.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/custom_icons_icons.dart';
 
@@ -20,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
   final _confirmPasswordController = TextEditingController(text: '');
-  bool _login = true;
+  bool login = true;
   bool _passwordsNotMatched = false;
   bool _isLoading = false;
 
@@ -32,98 +28,108 @@ class _LoginPageState extends State<LoginPage> {
             ? Center(
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
                 CircularProgressIndicator(),
-                SizedBox(
-                  height: 10.0
-                ),
+                SizedBox(height: 10.0),
                 Text('Iniciando sesión')
               ]))
             : CustomScrollColor(
-                child: ListView(
-                  children: <Widget>[
-                    SizedBox(height: 50.0),
-                    Center(
-                        child: Icon(CustomIcons.water_amount_large, color: Colors.white, size: 80)),
-                    SizedBox(height: 50.0),
-                    Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                        elevation: 4.0,
-                        margin: new EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                        child: Form(
-                            key: _formKey,
-                            child: SingleChildScrollView(
-                                padding: EdgeInsets.all(20.0),
-                                child: Column(children: <Widget>[
-                                  TextFormField(
-                                      controller: _emailController,
-                                      decoration:
-                                          InputDecoration(helperText: 'Correo', counterText: ''),
-                                      maxLength: 25,
-                                      validator: (String value) {
-                                        if (value.isEmpty ||
-                                            !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                                .hasMatch(value)) {
-                                          return 'El correo ingresado no cumple el formato ';
-                                        }
-                                      }),
-                                  TextField(
-                                      controller: _passwordController,
-                                      decoration: InputDecoration(
-                                          helperText: 'Contraseña',
-                                          counterText: '',
-                                          errorText: _passwordsNotMatched
-                                              ? 'Las contraseñas no coinciden'
-                                              : null),
-                                      obscureText: true,
-                                      maxLength: 20),
-                                  _login
-                                      ? Container()
-                                      : TextField(
-                                          controller: _confirmPasswordController,
-                                          decoration: InputDecoration(
-                                              helperText: 'Confirmar contraseña',
-                                              counterText: '',
-                                              errorText: _passwordsNotMatched
-                                                  ? 'Las contraseñas no coinciden'
-                                                  : null),
-                                          obscureText: true,
-                                          maxLength: 20),
-                                  SizedBox(height: 10.0),
-                                  Divider(),
-                                  ScopedModelDescendant<MainModel>(builder: (BuildContext context, Widget child, MainModel model){
-                                      return Container(
-                                          width: MediaQuery.of(context).size.width,
-                                          child: FlatButton(
-                                              child: Text(_login ? 'INGRESAR' : 'CREAR CUENTA',
-                                                  style: TextStyle(color: Colors.white)),
-                                              onPressed: ()=>_authenticate(model),
-                                              color: GreenMain));
-                                  })
-                                ])))),
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                      Text(_login ? '¿Aún no tienes cuenta? ' : '¿Ya tienes cuenta? ',
-                          style: TextStyle(color: Colors.white)),
-                      InkWell(
-                        onTap: toggleLoginToCreateAccount,
-                        child: Text(_login ? 'Regístrate' : 'Inicia Sesión',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      )
-                    ]),
-                    SizedBox(height: 30.0),
-                    Center(
-                      child: InkWell(
-                        onTap: () {},
-                        child: Text('Términos y condiciones',
-                            style: TextStyle(color: Colors.white, fontSize: 13.0)),
-                      ),
-                    ),
-                  ],
-                ),
-              ));
+                child: ListView(children: <Widget>[
+                SizedBox(height: 50.0),
+                Center(child: Icon(CustomIcons.water_amount_large, color: Colors.white, size: 80)),
+                SizedBox(height: 50.0),
+                Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                    elevation: 4.0,
+                    margin: new EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    child: Form(
+                        key: _formKey,
+                        child: SingleChildScrollView(
+                            padding: EdgeInsets.all(20.0),
+                            child: Column(children: <Widget>[
+                              _buildEmailTextField(),
+                              _buildPasswordTextField(),
+                              login ? Container() : _buildConfirmPassword(),
+                              SizedBox(height: 10.0),
+                              Divider(),
+                              ScopedModelDescendant<MainModel>(
+                                  builder: (BuildContext context, Widget child, MainModel model) {
+                                return _buildLoginSignUpbutton(model);
+                              })
+                            ])))),
+                _buildLoginOrSignUp(),
+                SizedBox(height: 30.0),
+                _buildTermsAndConditions()
+              ])));
+  }
+
+  Widget _buildEmailTextField() {
+    return TextFormField(
+        controller: _emailController,
+        decoration: InputDecoration(helperText: 'Correo', counterText: ''),
+        maxLength: 25,
+        validator: (String value) {
+          if (value.isEmpty || !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+            return 'El correo ingresado no cumple el formato ';
+          }
+        });
+  }
+
+  Widget _buildPasswordTextField() {
+    return TextField(
+        controller: _passwordController,
+        decoration: InputDecoration(
+            helperText: 'Contraseña',
+            counterText: '',
+            errorText: _passwordsNotMatched ? 'Las contraseñas no coinciden' : null),
+        obscureText: true,
+        maxLength: 20);
+  }
+
+  Widget _buildConfirmPassword() {
+    return TextField(
+        controller: _confirmPasswordController,
+        decoration: InputDecoration(
+            helperText: 'Confirmar contraseña',
+            counterText: '',
+            errorText: _passwordsNotMatched ? 'Las contraseñas no coinciden' : null),
+        obscureText: true,
+        maxLength: 20);
+  }
+
+  Widget _buildLoginSignUpbutton(MainModel model) {
+    return Container(
+        width: MediaQuery.of(context).size.width,
+        child: FlatButton(
+            child: Text(login ? 'INGRESAR' : 'CREAR CUENTA', style: TextStyle(color: Colors.white)),
+            onPressed: () => _authenticate(model),
+            color: GreenMain));
+  }
+
+  Widget _buildLoginOrSignUp() {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+      Text(login ? '¿Aún no tienes cuenta? ' : '¿Ya tienes cuenta? ',
+          style: TextStyle(color: Colors.white)),
+      InkWell(
+        onTap: toggleLoginToCreateAccount,
+        child: Text(login ? 'Regístrate' : 'Inicia Sesión',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      )
+    ]);
+  }
+
+  Widget _buildTermsAndConditions() {
+    return Center(
+      child: InkWell(
+        //TODO:Link to terms and conditions
+        onTap: () {},
+        child:
+            Text('Términos y condiciones', style: TextStyle(color: Colors.white, fontSize: 13.0)),
+      ),
+    );
   }
 
   toggleLoginToCreateAccount() {
     setState(() {
-      _login = !_login;
+      login = !login;
       _formKey.currentState.reset();
       _emailController.text = '';
       _passwordController.text = '';
@@ -137,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _authenticate(MainModel model) async {
-    if (!_login && !_confirmPassword()) {
+    if (!login && !_confirmPassword()) {
       setState(() {
         _passwordsNotMatched = true;
         _isLoading = false;
@@ -160,20 +166,7 @@ class _LoginPageState extends State<LoginPage> {
           'email': _emailController.text,
           'password': _passwordController.text
         };
-        Response res;
-        if (_login) {
-          res = await post(
-              'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyDi5Vxp1H07xK9-9m00aW3gpE-UTHamsZw',
-              body: json.encode(authData),
-              headers: {'Content-Type': 'application/json'});
-        } else {
-          res = await post(
-              'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyDi5Vxp1H07xK9-9m00aW3gpE-UTHamsZw',
-              body: json.encode(authData),
-              headers: {'Content-Type': 'application/json'});
-        }
-        final Map<String, dynamic> responseData = json.decode(res.body);
-        Map<String, dynamic> successInformation = _checkAuthenticate(responseData,model);
+        Map<String, dynamic> successInformation = await model.authenticate(login, authData);
         if (successInformation['success']) {
           _goToPlantsManagerPage(model);
         } else {
@@ -188,9 +181,9 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text('Ok'),
                       onPressed: () {
                         Navigator.pop(context);
-                      },
+                      }
                     )
-                  ],
+                  ]
                 );
               });
         }
@@ -201,24 +194,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Map<String, dynamic> _checkAuthenticate(Map<String, dynamic> responseData,MainModel model) {
-    bool hasError = true;
-    String message = 'Ocurrió un error';
-    if (responseData.containsKey('idToken')) {
-      hasError = false;
-      message = 'Autenticación exitosa.';
-      model.setOwnerId(responseData['localId']);
-    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
-      message = 'Este correo no fue encontrado.';
-    } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
-      message = 'Contraseña inválida.';
-    } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
-      message = 'Este correo ya existe';
-    }
-
-    return {'success': !hasError, 'message': message};
-  }
-
-  _goToPlantsManagerPage(Model model) => Navigator.pushReplacement(context,
-      MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage(model)));
+  _goToPlantsManagerPage(Model model) => Navigator.pushReplacement(
+      context, MaterialPageRoute<bool>(builder: (BuildContext context) => PageManagerPage(model)));
 }

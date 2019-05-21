@@ -10,7 +10,7 @@ import 'package:wetplant/constants/available-reminders.dart';
 import 'package:wetplant/constants/colors';
 import 'package:wetplant/model/garden_plant.dart';
 import 'package:wetplant/model/reminder.dart';
-import 'package:wetplant/pages/page_manager.dart';
+import 'package:wetplant/pages/manager.dart';
 import 'package:wetplant/scoped_model/main_model.dart';
 import 'package:wetplant/util/reminder_type.dart';
 
@@ -194,7 +194,7 @@ class PlantEditPageState extends State<PlantEditPage> {
     });
     Map<String, dynamic> jsonNewPlant = {
       'id': _editing ? widget.gardenPlant.plant.id : null,
-      'ownerId': model.ownerId,
+      'ownerId': model.authenticatedUser.id,
       'name': _nameTextController.text,
       'image': widget?.gardenPlant?.plant?.image??'',
       'reminders': _getJsonReminders(_localReminders),
